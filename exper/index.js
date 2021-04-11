@@ -58,7 +58,7 @@ function info_get () {
             html:"<p><input name='Q0' type='number' value=' ' required/></p>",
             button_label:"继续",
             on_finish: function (data) {
-                info["NumbeOfExperiments"] = data.response.Q0;
+                info["NumberOfExperiments"] = data.response.Q0;
             }
         }, {
             type:"survey-html-form",
@@ -111,5 +111,37 @@ function info_get () {
                 localStorage.setItem("info", JSON.stringify(info));
             }
         }]
+    }
+}
+
+function introducation_prac1() { 
+    return {
+        // 指导语部分
+        type: "instructions",
+        pages: [
+            "<p style='text-align: left'>\
+            指导语：维度评分<br/>\
+            指导语内容</p>",
+        ],
+        show_clickable_nav: true,
+        allow_backward: false,
+        button_label_previous: "返回",
+        button_label_next: "继续",
+    }
+}
+
+function introducation_prac2() { 
+    return {
+        // 指导语部分
+        type: "instructions",
+        pages: [
+            "<p style='text-align: left'>\
+            指导语：效度评分<br/>\
+            指导语内容</p>",
+        ],
+        show_clickable_nav: true,
+        allow_backward: false,
+        button_label_previous: "返回",
+        button_label_next: "继续",
     }
 }
