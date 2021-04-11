@@ -12,52 +12,88 @@
         <script src="../assets/jspsych/plugins/jspsych-fullscreen.js"></script>
         <script src="../assets/jspsych/plugins/jspsych-instructions.js"></script>
         <script src="../assets/jspsych/plugins/jspsych-survey-likert.js"></script>
+        <script src="../assets/jspsych/plugins/jspsych-survey-html-form.js"></script>
+        <script src="../assets/jspsych/plugins/jspsych-html-button-response.js"></script>
+        <script src="../assets/jspsych/plugins/jspsych-html-keyboard-response.js"></script>
+        <script src="../assets/jspsych/plugins/jspsych-call-function.js"></script>
+        <!-- 本实验的js函数 -->
+        <script src="index.js"></script>
+        <script src="word.js"></script>
     </head>
-    <body style="text-align: center;"></body>
+    <body style="text-align: center; background-color: grey; color: white;"></body>
     <script>
+        // 调试用
+        localStorage.clear();
+
+        // 问题探讨
+        
+        // 1单词 -> 5维度
+        // 2200 单词 
+        // 1000， 5/6个block
+
+        // 50 一小块
+        // 1
+        // 
+
+        // 1 2
+        // 【单词A， DA呢】
+        // 1 2
+        // 【C、D】
+        //  1 2
+
+        // 实验参数
+        let exper_number = "S01";
+        let word_block_num = 150; // 单个block的单词数量
+        let word_first_day = 1000; // 第一天的单词数量
 
 
 
-        let wordAll = []; //定义单词库
+        // let word_tmp = localStorage.getItem("WordSurplus") ? 
+        //     localStorage.getItem("WordSurplus") : 
+        //     jsPsych.randomization.sampleWithoutReplacement(wordAll, 1000);
+        let debug = false
+        if (jsPsych.data.getURLVariable("debug")) { 
+            debug = true;
+        } // 这玩意，只是为了方便调试
 
+        let word_tmp; // 保存 当天需要的单词数量
+
+        if (!localStorage.getItem("WordSurplus")) { 
+            // 第一天的话
+            localStorage.clear();
+            let p = jsPsych.randomization.shuffle(getWord());
+            word_tmp = p.splice(0, word_first_day);
+            localStorage.setItem("WordSurplus", JSON.stringify(p));
+        } else { 
+            // 第二天
+            word_tmp = JSON.parse(localStorage.getItem("WordSurplus"));
+        }
 
         let timeline = []; // 定义空的时间线
+        let info = {}; // 保存被试信息
 
-        function begin_introduction () {
-            return {
-                timeline: [
-                    {
-                        type: 'fullscreen',
-                        fullscreen_mode: true,
-                        message: "<p style='font: bold 42px 微软雅黑; color: #B22222'>\
-                            欢迎参与我们的实验</p>\
-                            <p style='font: 30px 微软雅黑; color: black'><br/>\
-                            <单击下方 我同意 进入实验程序><br/><b>实验过程中请勿退出全屏</b>\
-                            <br/><br/></p>\
-                            <p style='font: 24px 华文中宋; color: grey'>\
-                            南京师范大学心理学院<br/>2021年</p>",
-                            button_label: "我同意"
-                    },
-                    {
-                        type: "instructions",
-                        pages: [
-                            "<p style='text-align: left'>\
-                            指导语：<br/>\
-                            指导语内容</p>",
-                        ],
-                        show_clickable_nav: true,
-                        allow_backward: false,
-                        button_label_previous: "返回",
-                        button_label_next: "继续",
-                    }
-                ]
-            }
+        // 定义 单词 顺序
+        let variable = [];
+        for (let i = 0; i < word_tmp.length; i++) { 
+            variable.push({
+                word: word_tmp[i],
+                len: word_tmp[i].length
+            })
         }
-        timeline.push(begin_introduction());
+        variable = jsPsych.randomization.shuffle(variable);
 
-        // 第一部分 评分
-        var scale = ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"];
+// 最初部分 实验指导语
+        if (!localStorage.getItem("info")) { 
+            // 如果是第一天，找不到信息的话
+            timeline.push(begin_introduction(), info_get());
+        } else { 
+            // 如果 被试信息存在的话，则使用先前的信息
+            info = JSON.parse(localStorage.getItem("info"));
+            timeline.push(begin_introduction());
+        }
 
+// 第一部分 维度评分 1
+        var scale = [1,2,3,4,5,6,7,8,9];
         let proc1 = {
             type: 'survey-likert',
             questions: [
@@ -67,7 +103,9 @@
               {prompt: "<strong>外表👇</strong>", name: 'appearance', labels: scale, required: true},
               {prompt: "<strong>社会经济地位👇</strong>", name: 'socioeconomicStatus', labels: scale, required: true}
             ],
-            preamble: '<p style="font-size: 30px;font-weight: 700;color: red;">[单词列表]</p>',
+            preamble: function() {
+                return '<p style="font-size: 30px;font-weight: 700;color: red;">' + jsPsych.timelineVariable("word", true) + '</p><p>请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）</p>';
+            },
             scale_width: 500,
             on_load: function() { 
                     // 让 标签 左移
@@ -87,7 +125,7 @@
                             $("input[name=Q2]:checked").length > 0 &&
                             $("input[name=Q3]:checked").length > 0 && 
                             $("input[name=Q4]:checked").length > 0){ 
-                            setTimeout(function(){
+                            setTimeout(function(){ 
                                 $("#jspsych-survey-likert-next").click()
                             }, 1500);
                         }
@@ -100,51 +138,45 @@
                     data.socialSkills = data.response.socialSkills;
                     data.appearance = data.response.appearance;
                     data.socioeconomicStatus = data.response.socioeconomicStatus;
+                    data.word = jsPsych.timelineVariable("word", true);
+                },
+                data: {
+                    subIdx: info["index"],
+                    NumberOfExperiments: info["NumberOfExperiments"],
+                    Name: info["Name"],
+                    Sex: info["Sex"],
+                    Education: info["Education"],
+                    BirthYear: info["BirthYear"],
+                    save: true
                 }
         };
-        timeline.push(proc1);
-
-        // 第二部分 匹配程度评分
+        if(debug){ 
+            timeline.push({
+                timeline: [proc1],
+                timeline_variables: variable.splice(0, 10)
+            });
+        } else { 
+            timeline.push({
+                timeline: [proc1],
+                timeline_variables: variable.splice(0, (variable.length<word_block_num) ? variable.length : word_block_num)
+            });
+            while(variable.length>0) { 
+                timeline.push({
+                    timeline: [proc1, {
+                        type: "html-keyboard-response",
+                        stimulus: "休息一下吧",
+                        choices: jsPsych.ALL_KEYS
+                    }],
+                    timeline_variables: variable.splice(0, (variable.length<word_block_num) ? variable.length : word_block_num)
+                });
+            }
+        }
+ 
+// 第二部分 效度打分
         let proc2 = {
             type: 'survey-multi-choice',
             questions: [
-                {prompt: '[单词A]用于描述【】维度', options: [1,2,3,4,5,6,7,8,9], required: true, horizontal: true}
-            ],
-            on_load: function() { 
-                // 定义头部文字样式
-                document.getElementsByClassName("survey-multi-choice")[0].style = "text-align: center; font-size: 25px;";
-
-                // 隐藏 continue 按钮
-                document.getElementById("jspsych-survey-multi-choice-next").style.visibility="hidden";
-                
-                // 创建下方提示语
-                let p = document.createElement("p");
-                p.innerHTML = "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
-                p.style = "font-size: 30px; font-weight: normal;";
-                document.getElementById("jspsych-content").appendChild(p);
-
-                $("input[type=radio]").on("input", function(a){
-                    // 判断是否全部选择了
-                    // 如果全部选择了，则延迟1秒跳转
-                    if($("input[type=radio]:checked").length > 0){ 
-                        setTimeout(function(){
-                            $("#jspsych-survey-multi-choice-next").click()
-                        }, 1500);
-                    }
-                })
-            },
-            on_finish: function(data) { 
-                // 分值的呈现
-                data.recognition = data.response.Q0;
-            }
-        };
-        timeline.push(proc2);
-
-        // 第三部分 效度打分
-        let proc3 = {
-            type: 'survey-multi-choice',
-            questions: [
-                {prompt: '[单词A]', options: [1,2,3,4,5,6,7,8,9], required: true, horizontal: true}
+                {prompt: jsPsych.timelineVariable("word"), options: [1,2,3,4,5,6,7,8,9], required: true, horizontal: true}
             ],
             on_load: function() { 
                 // 定义头部文字样式
@@ -172,9 +204,49 @@
             on_finish: function(data) { 
                 // 分值的呈现
                 data.validity = data.response.Q0;
-            }
+                data.word = jsPsych.timelineVariable("word", true);
+            },
+            data: {
+                    subIdx: info["index"],
+                    NumberOfExperiments: info["NumberOfExperiments"],
+                    Name: info["Name"],
+                    Sex: info["Sex"],
+                    Education: info["Education"],
+                    BirthYear: info["BirthYear"],
+                    save: true
+                }
         };
-        timeline.push(proc3);
+        // 定义一下第二个单词block
+        variable = [];
+        for (let i = 0; i < word_tmp.length; i++) { 
+            variable.push({
+                word: word_tmp[i],
+                len: word_tmp[i].length
+            })
+        }
+        variable = jsPsych.randomization.shuffle(variable);
+
+        if(debug){ 
+            timeline.push({
+                timeline: [proc2],
+                timeline_variables: variable.splice(0, 10)
+            });
+        } else { 
+            timeline.push({
+                timeline: [proc2],
+                timeline_variables: variable.splice(0, (variable.length<word_block_num) ? variable.length : word_block_num)
+            });
+            while(variable.length>0) { 
+                timeline.push({
+                    timeline: [proc2, {
+                        type: "html-keyboard-response",
+                        stimulus: "休息一下吧",
+                        choices: jsPsych.ALL_KEYS
+                    }],
+                    timeline_variables: variable.splice(0, (variable.length<word_block_num) ? variable.length : word_block_num)
+                });
+            }
+        }
 
         jsPsych.init({
             timeline: timeline,
@@ -183,5 +255,42 @@
             },
             
         });
+
+// 维度评分第二种类型，分开呈现
+// // 第一部分 维度评分 2
+// let proc2 = {
+//             type: 'survey-multi-choice',
+//             questions: [
+//                 {prompt: '[单词A]用于描述【】维度', options: [1,2,3,4,5,6,7,8,9], required: true, horizontal: true}
+//             ],
+//             on_load: function() { 
+//                 // 定义头部文字样式
+//                 document.getElementsByClassName("survey-multi-choice")[0].style = "text-align: center; font-size: 25px;";
+
+//                 // 隐藏 continue 按钮
+//                 document.getElementById("jspsych-survey-multi-choice-next").style.visibility="hidden";
+                
+//                 // 创建下方提示语
+//                 let p = document.createElement("p");
+//                 p.innerHTML = "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
+//                 p.style = "font-size: 30px; font-weight: normal;";
+//                 document.getElementById("jspsych-content").appendChild(p);
+
+//                 $("input[type=radio]").on("input", function(a){
+//                     // 判断是否全部选择了
+//                     // 如果全部选择了，则延迟1秒跳转
+//                     if($("input[type=radio]:checked").length > 0){ 
+//                         setTimeout(function(){
+//                             $("#jspsych-survey-multi-choice-next").click()
+//                         }, 1500);
+//                     }
+//                 })
+//             },
+//             on_finish: function(data) { 
+//                 // 分值的呈现
+//                 data.recognition = data.response.Q0;
+//             }
+//         };
+//         timeline.push(proc2);
     </script>
 </html>
