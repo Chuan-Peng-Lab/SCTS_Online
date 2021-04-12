@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
     <head>
-        <meta charset="UTF=8">
+        <meta charset="utf-8">
         <title>社会认知词库量表</title>
         <!-- 实用工具 -->
         <script src='../assets/js/jquery-3.6.0.min.js'></script>
@@ -18,6 +18,7 @@
         <script src="../assets/jspsych/plugins/jspsych-call-function.js"></script>
         <!-- 本实验的js函数 -->
         <script src="index.js"></script>
+        <!-- 这个word里面放的是单词，全部都在里面 -->
         <script src="word.js"></script>
     </head>
     <body style="text-align: center; background-color: grey; color: white;"></body>
@@ -25,23 +26,34 @@
         // 实验参数
         let exper_number = "S01";
         let word_block_num = 150; // 单个block的单词数量
-        let word_first_day = 1000; // 第一天的单词数量
-        let delay = 1500; // 全部选择后 跳转延迟时间
+        let word_first_day = 1050; // 第一天的单词数量
+        let delay = 1500; // 全部选择后 跳转延迟时间，单位为毫秒
+        let blank = 500; // 每个trial之间的空白屏时间 单位 毫秒
 
-        // 以下非实验参数
+        let dimension = ["能力", "道德", "社交能力", "外表", "社会经济地位"]; // 需要维度评分的维度
+
+        // 以下非实验参数，最好不改
         let debug = false;
         let word_tmp; // 保存 当天需要的单词数量
         let timeline = []; // 定义空的时间线
         let info = {}; // 保存被试信息
-        let variable = [];
+        let variable = []; // 时间线变量
+        let timeout = 0; // 记录 setTimeout
 
         if (jsPsych.data.getURLVariable("debug")) { 
             debug = true;
+            // 调试参数
+            word_block_num = 5;
+            word_first_day = 35;
+            delay = 100;
+            if(jsPsych.data.getURLVariable("auto")) { 
+                auto(); // 自动运行，方便调试
+            }
         } // 这玩意，只是为了方便调试
 
         if (!localStorage.getItem("WordSurplus") || parseInt(jsPsych.data.getURLVariable("day")) === 1) { 
-            // 第一天的话 或者 不存在剩余word的话
-            localStorage.clear();
+            // 第一天的话 或者 不存在剩余单词的话
+            localStorage.removeItem("WordSurplus");
             let p = jsPsych.randomization.shuffle(getWord());
             word_tmp = p.splice(0, word_first_day);
             localStorage.setItem("WordSurplus", JSON.stringify(p));
@@ -50,18 +62,9 @@
             word_tmp = JSON.parse(localStorage.getItem("WordSurplus"));
         }
 
-        variable = [];
-        for (let i = 0; i < word_tmp.length; i++) { 
-            variable.push({
-                word: word_tmp[i],
-                len: word_tmp[i].length
-            })
-        }
-        variable = jsPsych.randomization.shuffle(variable);
-
 // 最初部分 实验指导语
-        if (!localStorage.getItem("info") || parseInt(jsPsych.data.getURLVariable("day")) === 1) { 
-            // 如果找不到信息的话
+        if (!localStorage.getItem("info") || (parseInt(jsPsych.data.getURLVariable("day")) === 1 && !jsPsych.data.getURLVariable("debug"))) { 
+            // 如果找不到信息的话 并且 不再debug情况下
             timeline.push(begin_introduction(), info_get());
         } else { 
             // 如果 被试信息存在的话，则使用先前的信息
@@ -70,106 +73,112 @@
         }
 
 // 第一部分 维度评分 1
-        var scale = [1,2,3,4,5,6,7,8,9];
-        let proc1 = {
-            type: 'survey-likert',
-            questions: [
-              {prompt: "<strong>能力👇</strong>", name: 'ability', labels: scale, required: true}, 
-              {prompt: "<strong>道德👇</strong>", name: 'morality', labels: scale, required: true},
-              {prompt: "<strong>社交能力👇</strong>", name: 'socialSkills', labels: scale, required: true},
-              {prompt: "<strong>外表👇</strong>", name: 'appearance', labels: scale, required: true},
-              {prompt: "<strong>社会经济地位👇</strong>", name: 'socioeconomicStatus', labels: scale, required: true}
-            ],
-            preamble: function() {
-                return '<p style="font-size: 30px;font-weight: 700;">' + jsPsych.timelineVariable("word", true) + '</p><p>请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）</p>';
-            },
-            scale_width: 500,
-            on_load: function() { 
-                    // 让 标签 左移
-                    let a = document.getElementsByClassName("jspsych-survey-likert-statement");
-                    for (let i = 0; i < a.length; i++){ 
-                        a[i].style.textAlign = "left";
-                        a[i].style.paddingTop = "0px";
-                    }
-                    // 隐藏 continue 按钮
-                    document.getElementById("jspsych-survey-likert-next").style.visibility="hidden";
-
-                    $("input[type=radio]").on("input", function(a){
-                        // 判断是否全部选择了
-                        // 如果全部选择了，则延迟1.5秒跳转
-                        if($("input[name=Q0]:checked").length > 0 && 
-                            $("input[name=Q1]:checked").length > 0 && 
-                            $("input[name=Q2]:checked").length > 0 &&
-                            $("input[name=Q3]:checked").length > 0 && 
-                            $("input[name=Q4]:checked").length > 0){ 
-                            setTimeout(function(){ 
-                                $("#jspsych-survey-likert-next").click()
-                            }, delay);
-                        }
+        let tmpWord = jsPsych.randomization.shuffle(word_tmp);
+        // 对单词切片分组
+        while(tmpWord.length > 0) { 
+            let p = tmpWord.splice(0, Math.min(word_block_num, tmpWord.length));
+            for (let i = 0; i < dimension.length; i++){ 
+                let a = [];
+                for(let j = 0; j < p.length; j++) { 
+                    a.push({
+                        word: p[j],
+                        dimension: dimension[i],
+                        len: p[j].length,
+                        wordGroup: (i + 1).toString(),
+                        dimensionGroup: Math.floor(tmpWord.length / word_block_num).toString(),
+                        serial: j
                     });
-                    // 偷个懒，可以通过按键 模拟 鼠标单击
-                    $("body").keydown(function(a){
-                        let key = a.originalEvent.key;
-                        if(parseInt(key) > 0) { 
-                            $("input[name=Q0]:checked").length == 0 ? $("input[name=Q0]")[parseInt(key) - 1].click() : (
-                                $("input[name=Q1]:checked").length == 0 ? $("input[name=Q1]")[parseInt(key) - 1].click() : (
-                                    $("input[name=Q2]:checked").length == 0 ? $("input[name=Q2]")[parseInt(key) - 1].click() : (
-                                        $("input[name=Q3]:checked").length == 0 ? $("input[name=Q3]")[parseInt(key) - 1].click() : (
-                                            $("input[name=Q4]:checked").length == 0 ? $("input[name=Q4]")[parseInt(key) - 1].click() : $("body").unbind()
-                                        )
-                                    )
-                                )
-                            );
-                        }
-                    });
-                },
-                on_finish: function(data) { 
-                    // 五维度评分结果呈现
-                    data.ability = data.response.ability;
-                    data.morality = data.response.morality;
-                    data.socialSkills = data.response.socialSkills;
-                    data.appearance = data.response.appearance;
-                    data.socioeconomicStatus = data.response.socioeconomicStatus;
-                    data.word = jsPsych.timelineVariable("word", true);
-                    data.wordLen = jsPsych.timelineVariable("len", true);
-                    data.subIdx = info["index"];
-                    data.NumberOfExperiments = info["NumberOfExperiments"];
-                    data.Name = info["Name"];
-                    data.Sex = info["Sex"];
-                    data.Education = info["Education"];
-                    data.BirthYear = info["BirthYear"];
-                    $("body").unbind();
-                },
-                data: {
-                    save: true
                 }
-        };
-
-        timeline.push(introducation_prac1());
-        if(debug){ 
-            timeline.push({
-                timeline: [proc1],
-                timeline_variables: variable.splice(0, 3)
-            });
-        } else { 
-            timeline.push({
-                timeline: [proc1],
-                timeline_variables: variable.splice(0, (variable.length<word_block_num) ? variable.length : word_block_num)
-            });
-            while(variable.length>word_block_num) { 
-                timeline.push({
-                    timeline: [proc1, {
-                        type: "html-keyboard-response",
-                        stimulus: "休息一下吧",
-                        choices: jsPsych.ALL_KEYS
-                    }],
-                    timeline_variables: variable.splice(0, word_block_num)
-                });
+                variable.push(a);
             }
         }
+        let prac1 = {
+            type: 'survey-multi-choice',
+            questions: [
+                {prompt: function() {
+                    return jsPsych.timelineVariable("word", true) + '用于描述' + jsPsych.timelineVariable("dimension", true) + '维度';
+                }, options: [1,2,3,4,5,6,7,8,9], required: true, horizontal: true}
+            ],
+            on_load: function() { 
+                // 定义头部文字样式
+                document.getElementsByClassName("survey-multi-choice")[0].style = "text-align: center; font-size: 25px;";
+
+                // 隐藏 continue 按钮
+                document.getElementById("jspsych-survey-multi-choice-next").style.visibility="hidden";
+                
+                // 创建下方提示语
+                let p = document.createElement("p");
+                p.innerHTML = "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
+                p.style = "font-size: 30px; font-weight: normal;";
+                document.getElementById("jspsych-content").appendChild(p);
+
+                $("input[type=radio]").on("input", function(a){
+                    // 判断是否全部选择了
+                    if($("input[type=radio]:checked").length > 0){ 
+                        if(timeout != 0) { clearTimeout(timeout); timeout = 0; }
+                        timeout = setTimeout(function(){
+                            $("#jspsych-survey-multi-choice-next").click()
+                        }, delay);
+                    }
+                });
+                $("body").keydown(function(a){
+                    let key = a.originalEvent.key;
+                    if(parseInt(key) > 0) { 
+                        $("input[type=radio]")[parseInt(key) - 1].click();
+                    }
+                });
+            },
+            on_finish: function(data) { 
+                // 分值的呈现
+                data.word = jsPsych.timelineVariable("word", true);
+                data.wordLen = jsPsych.timelineVariable("len", true);
+                data.dimension = jsPsych.timelineVariable("dimension", true);
+                data.wordGroup = jsPsych.timelineVariable("wordGroup", true);
+                data.dimensionGroup = jsPsych.timelineVariable("dimensionGroup", true);
+                data.serial = jsPsych.timelineVariable("serial", true);
+                
+                data.subIdx = info["index"];
+                data.NumberOfExperiments = info["NumberOfExperiments"];
+                data.Name = info["Name"];
+                data.Sex = info["Sex"];
+                data.Education = info["Education"];
+                data.BirthYear = info["BirthYear"];
+                data.recognition = data.response.Q0;
+                // 给窗口初始化
+                $("body").unbind();
+                clearTimeout(timeout);
+                timeout = 0;
+            },
+            data: {
+                save: true
+            }
+        };
+        timeline.push(introducation_prac1(), {
+            timeline: [prac1],
+            timeline_variables: jsPsych.randomization.shuffle(variable.splice(Math.floor(Math.random() * variable.length), 1))[0]
+        });
+        while(variable.length > 0){
+            timeline.push({
+                type: "html-keyboard-response",
+                stimulus: "休息一下吧",
+                choices: jsPsych.ALL_KEYS
+            }, {
+                timeline: [prac1],
+                timeline_variables: jsPsych.randomization.shuffle(variable.splice(Math.floor(Math.random() * variable.length), 1))[0]
+            });
+        }
  
-// 第二部分 效度打分
-        let proc2 = {
+// 第二部分 效价打分
+        // 定义一下第二个单词block,防止时间线变量为空
+        variable = [];
+        for (let i = 0; i < word_tmp.length; i++) { 
+            variable.push({
+                word: word_tmp[i],
+                len: word_tmp[i].length
+            });
+        }
+        variable = jsPsych.randomization.shuffle(variable);
+        let prac2 = {
             type: 'survey-multi-choice',
             questions: [
                 {prompt: jsPsych.timelineVariable("word"), options: [1,2,3,4,5,6,7,8,9], required: true, horizontal: true}
@@ -191,7 +200,8 @@
                     // 判断是否全部选择了
                     // 如果全部选择了，则延迟1秒跳转
                     if($("input[type=radio]:checked").length > 0){ 
-                        setTimeout(function(){
+                        if(timeout != 0) { clearTimeout(timeout); timeout = 0; }
+                        timeout = setTimeout(function(){
                             $("#jspsych-survey-multi-choice-next").click()
                         }, delay);
                     }
@@ -214,64 +224,40 @@
                 data.Sex = info["Sex"];
                 data.Education = info["Education"];
                 data.BirthYear = info["BirthYear"];
+
+                $("body").unbind();
+                clearTimeout(timeout);
+                timeout = 0;
             },
             data: {
                     save: true
                 }
         };
 
-        // 更新variable，防止variable为空
-        timeline.push({
-            type: "call-function",
-            func: function() { 
-                // 定义一下第二个单词block
-                variable = [];
-                for (let i = 0; i < word_tmp.length; i++) { 
-                    variable.push({
-                        word: word_tmp[i],
-                        len: word_tmp[i].length
-                    })
-                }
-                variable = jsPsych.randomization.shuffle(variable);
-            }
+        timeline.push(introducation_prac2(), {
+            timeline: [prac2],
+            timeline_variables: variable.splice(0, (variable.length<word_block_num) ? variable.length : word_block_num)
         });
-
-        timeline.push(introducation_prac2());
-        if(debug){ 
+        while(variable.length>0) { 
             timeline.push({
-                timeline: [proc2],
-                timeline_variables: variable.splice(0, 3)
+                type: "html-keyboard-response",
+                stimulus: "休息一下吧",
+                choices: jsPsych.ALL_KEYS
+            }, {
+                timeline: [prac2],
+                timeline_variables: variable.splice(0, Math.min(word_block_num, variable.length))
             });
-        } else { 
-            timeline.push({
-                timeline: [proc2],
-                timeline_variables: variable.splice(0, (variable.length<word_block_num) ? variable.length : word_block_num)
-            });
-            while(variable.length>word_block_num) { 
-                timeline.push({
-                    timeline: [proc2, {
-                        type: "html-keyboard-response",
-                        stimulus: "休息一下吧",
-                        choices: jsPsych.ALL_KEYS
-                    }],
-                    timeline_variables: variable.splice(0, word_block_num)
-                });
-            };
-            // 最后的时间线
-            timeline.push({
-                    timeline: [proc2],
-                    timeline_variables: variable.splice(0, variable.length)
-                });
         }
 
         jsPsych.init({
             timeline: timeline,
+            default_iti: blank,
             on_finish: function() { 
                 jsPsych.data.displayData();
 
                 $("#jspsych-content")[0].innerHTML = "正在保存数据中，请稍后";
 
-                jsPsych.data.get().filter({save: true}).filterColumns(["subIdx", "Name", "Sex", "Education", "BirthYear", "word", "wordLen", "ability", "morality", "socialSkills", "appearance", "socioeconomicStatus", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]).localSave('csv', info["index"] + "_" + info["NumberOfExperiments"] + '.csv');
+                jsPsych.data.get().filter({save: true}).filterColumns(["subIdx", "Name", "Sex", "Education", "BirthYear", "word", "wordLen", "wordGroup", "dimension", "dimensionGroup", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]).localSave('csv', info["index"] + "_" + info["NumberOfExperiments"] + '.csv');
 
                 $("#jspsych-content")[0].innerHTML = "<div><p style = 'color:white; font-size = 20px'>实验结束，\
                     非常感谢您的参与！</p > \
@@ -280,41 +266,79 @@
             }
         });
 
-// 维度评分第二种类型，分开呈现
-// // 第一部分 维度评分 2
-// let proc2 = {
-//             type: 'survey-multi-choice',
+// var scale = [1,2,3,4,5,6,7,8,9];
+//         let prac1 = {
+//             type: 'survey-likert',
 //             questions: [
-//                 {prompt: '[单词A]用于描述【】维度', options: [1,2,3,4,5,6,7,8,9], required: true, horizontal: true}
+//               {prompt: "<strong>能力👇</strong>", name: 'ability', labels: scale, required: true}, 
+//               {prompt: "<strong>道德👇</strong>", name: 'morality', labels: scale, required: true},
+//               {prompt: "<strong>社交能力👇</strong>", name: 'socialSkills', labels: scale, required: true},
+//               {prompt: "<strong>外表👇</strong>", name: 'appearance', labels: scale, required: true},
+//               {prompt: "<strong>社会经济地位👇</strong>", name: 'socioeconomicStatus', labels: scale, required: true}
 //             ],
-//             on_load: function() { 
-//                 // 定义头部文字样式
-//                 document.getElementsByClassName("survey-multi-choice")[0].style = "text-align: center; font-size: 25px;";
-
-//                 // 隐藏 continue 按钮
-//                 document.getElementById("jspsych-survey-multi-choice-next").style.visibility="hidden";
-                
-//                 // 创建下方提示语
-//                 let p = document.createElement("p");
-//                 p.innerHTML = "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
-//                 p.style = "font-size: 30px; font-weight: normal;";
-//                 document.getElementById("jspsych-content").appendChild(p);
-
-//                 $("input[type=radio]").on("input", function(a){
-//                     // 判断是否全部选择了
-//                     // 如果全部选择了，则延迟1秒跳转
-//                     if($("input[type=radio]:checked").length > 0){ 
-//                         setTimeout(function(){
-//                             $("#jspsych-survey-multi-choice-next").click()
-//                         }, 1500);
-//                     }
-//                 })
+//             preamble: function() {
+//                 return '<p style="font-size: 30px;font-weight: 700;">' + jsPsych.timelineVariable("word", true) + '</p><p>请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）</p>';
 //             },
-//             on_finish: function(data) { 
-//                 // 分值的呈现
-//                 data.recognition = data.response.Q0;
-//             }
+//             scale_width: 500,
+//             on_load: function() { 
+//                     // 让 标签 左移
+//                     let a = document.getElementsByClassName("jspsych-survey-likert-statement");
+//                     for (let i = 0; i < a.length; i++){ 
+//                         a[i].style.textAlign = "left";
+//                         a[i].style.paddingTop = "0px";
+//                     }
+//                     // 隐藏 continue 按钮
+//                     document.getElementById("jspsych-survey-likert-next").style.visibility="hidden";
+
+//                     $("input[type=radio]").on("input", function(a){
+//                         // 判断是否全部选择了
+//                         // 如果全部选择了，则延迟1.5秒跳转
+//                         if($("input[name=Q0]:checked").length > 0 && 
+//                             $("input[name=Q1]:checked").length > 0 && 
+//                             $("input[name=Q2]:checked").length > 0 &&
+//                             $("input[name=Q3]:checked").length > 0 && 
+//                             $("input[name=Q4]:checked").length > 0){ 
+//                             setTimeout(function(){ 
+//                                 $("#jspsych-survey-likert-next").click()
+//                             }, delay);
+//                         }
+//                     });
+//                     // 偷个懒，可以通过按键 模拟 鼠标单击
+//                     $("body").keydown(function(a){
+//                         let key = a.originalEvent.key;
+//                         if(parseInt(key) > 0) { 
+//                             $("input[name=Q0]:checked").length == 0 ? $("input[name=Q0]")[parseInt(key) - 1].click() : (
+//                                 $("input[name=Q1]:checked").length == 0 ? $("input[name=Q1]")[parseInt(key) - 1].click() : (
+//                                     $("input[name=Q2]:checked").length == 0 ? $("input[name=Q2]")[parseInt(key) - 1].click() : (
+//                                         $("input[name=Q3]:checked").length == 0 ? $("input[name=Q3]")[parseInt(key) - 1].click() : (
+//                                             $("input[name=Q4]:checked").length == 0 ? $("input[name=Q4]")[parseInt(key) - 1].click() : $("body").unbind()
+//                                         )
+//                                     )
+//                                 )
+//                             );
+//                         }
+//                     });
+//                 },
+//                 on_finish: function(data) { 
+//                     // 五维度评分结果呈现
+//                     data.ability = data.response.ability;
+//                     data.morality = data.response.morality;
+//                     data.socialSkills = data.response.socialSkills;
+//                     data.appearance = data.response.appearance;
+//                     data.socioeconomicStatus = data.response.socioeconomicStatus;
+//                     data.word = jsPsych.timelineVariable("word", true);
+//                     data.wordLen = jsPsych.timelineVariable("len", true);
+//                     data.subIdx = info["index"];
+//                     data.NumberOfExperiments = info["NumberOfExperiments"];
+//                     data.Name = info["Name"];
+//                     data.Sex = info["Sex"];
+//                     data.Education = info["Education"];
+//                     data.BirthYear = info["BirthYear"];
+//                     $("body").unbind();
+//                 },
+//                 data: {
+//                     save: true
+//                 }
 //         };
-//         timeline.push(proc2);
     </script>
 </html>

@@ -1,3 +1,13 @@
+// auto run
+function auto() { 
+    setInterval(function(){ 
+        document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keydown", {key: "1"}));
+        document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keydown", {key: "w"}));
+        document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keyup", {key: "w"}));
+    }, 1000)
+}
+
+
 function begin_introduction () {
     return {
         timeline: [
