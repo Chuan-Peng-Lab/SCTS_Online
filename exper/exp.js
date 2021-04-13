@@ -56,7 +56,7 @@ function info_get () {
     }
 }
 
-// 维度评分
+// 维度评分 指导语
 function introducation_prac1() { 
     return {
         // 指导语部分
@@ -73,7 +73,7 @@ function introducation_prac1() {
     }
 }
 
-// 效价评分
+// 效价评分 指导语
 function introducation_prac2() { 
     return {
         // 指导语部分
@@ -166,7 +166,7 @@ function start() {
             data.Sex = info["Sex"];
             data.Education = info["Education"];
             data.BirthYear = info["BirthYear"];
-            data.recognition = data.response.Q0;
+            data.rating = data.response.Q0;
             // 给窗口初始化
             $("body").unbind();
             clearTimeout(timeout);
@@ -280,7 +280,7 @@ function start() {
 
             $("#jspsych-content")[0].innerHTML = "正在保存数据中，请稍后";
 
-            jsPsych.data.get().filter({ save: true }).filterColumns(["subIdx", "Name", "Sex", "Education", "BirthYear", "word", "wordLen", "wordGroup", "dimension", "dimensionGroup", "recognition", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]).localSave('csv', info["index"] + "_" + info["NumberOfExperiments"] + '.csv');
+            jsPsych.data.get().filter({ save: true }).filterColumns(["subIdx", "Name", "Sex", "Education", "BirthYear", "word", "wordLen", "wordGroup", "dimension", "dimensionGroup", "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]).localSave('csv', info["index"] + "_" + info["NumberOfExperiments"] + '.csv');
 
             $("#jspsych-content")[0].innerHTML = "<div><p style = 'color:white; font-size = 20px'>实验结束，\
             非常感谢您的参与！</p > \

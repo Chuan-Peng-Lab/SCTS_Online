@@ -86,19 +86,24 @@
             }
         }],
         on_finish: function () {
+            // 判断本地储存当中是否有 实验编号，如果有 且 day ！= 1，就代表第二天
             if(localStorage.getItem(info["index"]) &&  (jsPsych.data.getURLVariable("day") && jsPsych.data.getURLVariable("day") != 1)) { 
                 info = JSON.parse(localStorage.getItem(info["index"]));
                 word_tmp = info["WordSurplus"];
             } else { 
+                // 否则就是第一天
                 if(!jsPsych.data.getURLVariable("debug")) { 
+                    // debug 不移除index，便于测试实验
                     localStorage.removeItem(info["index"]);
                 } else if(localStorage.getItem(info["index"])) { 
+                    // 是debug的话，并且 info存在，就调用
                     info = JSON.parse(localStorage.getItem(info["index"]));
                 }
                 let p = jsPsych.randomization.shuffle(getWord());
                 word_tmp = p.splice(0, word_first_day);
                 info["WordSurplus"] = p;
             }
+            // 判断info是否完整
             if(Object.keys(info).length < 7) { 
                 timeline.push(begin_introduction(), info_get());
             } else { 
