@@ -118,10 +118,15 @@ function start() {
         questions: [
             {
                 prompt: function () {
-                    return "<label>" + jsPsych.timelineVariable("word", true) + '</label>用于描述<label>' + jsPsych.timelineVariable("dimension", true) + '</label>维度';
-                }, options: [1, 2, 3, 4, 5, 6, 7, 8, 9], required: true, horizontal: true
+                    return '<p id="text">以下词汇是否可以用于描述某个人的' + jsPsych.timelineVariable("dimension") + '</p>' + '<p id="text">' + jsPsych.timelineVariable("word") + '</p>';
+                }, options: [1, 2, 3, 4, 5, 6, 7, 8, 9], horizontal: true
             }
         ],
+        preamble: function() { 
+            return '<style> \
+            #text{ text-align: center; font-size: 25px; margin: 0.5em; }\
+            </style>';
+        },
         on_load: function () {
             // 定义头部文字样式
             document.getElementsByClassName("survey-multi-choice")[0].style = "text-align: center; font-size: 25px;";
@@ -132,7 +137,7 @@ function start() {
             // 创建下方提示语
             let p = document.createElement("p");
             p.innerHTML = "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
-            p.style = "font-size: 30px; font-weight: normal;";
+            p.style = "font-size: 20px; font-weight: normal;";
             document.getElementById("jspsych-content").appendChild(p);
 
             $("input[type=radio]").on("input", function (a) {
@@ -204,7 +209,7 @@ function start() {
     let prac2 = {
         type: 'survey-multi-choice',
         questions: [
-            { prompt: jsPsych.timelineVariable("word"), options: [1, 2, 3, 4, 5, 6, 7, 8, 9], required: true, horizontal: true }
+            { prompt: jsPsych.timelineVariable("word"), options: [1, 2, 3, 4, 5, 6, 7, 8, 9], horizontal: true }
         ],
         on_load: function () {
             // 定义头部文字样式
@@ -216,7 +221,7 @@ function start() {
             // 创建下方提示语
             let p = document.createElement("p");
             p.innerHTML = "请表明你对该单词的积极/消极程度评分<br/>（1 = 非常消极，9 = 非常积极）";
-            p.style = "font-size: 30px; font-weight: normal;";
+            p.style = "font-size: 20px; font-weight: normal;";
             document.getElementById("jspsych-content").appendChild(p);
 
             $("input[type=radio]").on("input", function (a) {
@@ -282,11 +287,12 @@ function start() {
 
             jsPsych.data.get().filter({ save: true }).filterColumns(["subIdx", "Name", "Sex", "Education", "BirthYear", "word", "wordLen", "wordGroup", "dimension", "dimensionGroup", "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]).localSave('csv', info["index"] + "_" + info["NumberOfExperiments"] + '.csv');
 
-            $("#jspsych-content")[0].innerHTML = "<div><p style = 'color:white; font-size = 20px'>实验结束，\
+            $("#jspsych-content")[0].innerHTML = "<div><p style = 'color:white; font-size : 20px'>实验结束，\
             非常感谢您的参与！</p > \
             <p style = 'color:white; font-size : 20px'>如果您对实验结果感兴趣，可以发邮件与我联系。</p > \
             <p style = 'color:white; font-size : 20px'>HCP（Email: xxx@gmail.com） </p ></div>";
-        }
+        },
+        show_progress_bar: true,
+        message_progress_bar: "南京师范大学心理学院 | 计算社会认知实验室"
     });
-
 }
