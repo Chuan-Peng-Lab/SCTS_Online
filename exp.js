@@ -252,6 +252,7 @@ function start() {
             data.BirthYear = info["BirthYear"];
 
             data.rating = data.response.Q0; // 维度评分
+            data.type = parseInt(jsPsych.data.getURLVariable("type"));
             // 给窗口初始化
             $("body").unbind();
             clearTimeout(timeout);
@@ -362,19 +363,15 @@ function start() {
         default_iti: blank,
         on_finish: function () {
             mupsyEnd({
-                data: jsPsych.data.get().filter({ save: true }).filterColumns(["subIdx", "Name", "Sex", "Education", "BirthYear", "word", "wordLen", "wordGroup", "dimension", "dimensionGroup", "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]).csv(),
+                data: jsPsych.data.get().filter({ save: true }).addToAll(info).filterColumns(
+                    ["subj_idx", "Name", "Sex", "Education", "BirthYear", "Type", 
+                    "word", "wordLen", "wordGroup", "dimension", "dimensionGroup", 
+                    "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]
+                ),
                 name: "SCTS",
                 end_html: "感谢你参与本次实验，本次实验到这里就结束了",
-                id: info["subj_idx"] + "_" + info["NumberOfExperiments"]
+                id: info["subj_idx"] + "_" + version + "_" + info["Series"]
             });
-            $("#jspsych-content")[0].innerHTML = "正在保存数据中，请稍后";
-
-            jsPsych.data.get().filter({ save: true }).filterColumns(["subIdx", "Name", "Sex", "Education", "BirthYear", "word", "wordLen", "wordGroup", "dimension", "dimensionGroup", "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]).localSave('csv', info["index"] + "_" + info["NumberOfExperiments"] + '.csv');
-
-            $("#jspsych-content")[0].innerHTML = "<div><p style = 'color:white; font-size : 20px'>实验结束，\
-            非常感谢您的参与！</p > \
-            <p style = 'color:white; font-size : 20px'>如果您对实验结果感兴趣，可以发邮件与我联系。</p > \
-            <p style = 'color:white; font-size : 20px'>HCP（Email: xxx@gmail.com） </p ></div>";
         },
         show_progress_bar: true,
         message_progress_bar: "南京师范大学心理学院 | 计算社会认知实验室"

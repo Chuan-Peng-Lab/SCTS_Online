@@ -1,7 +1,8 @@
 // auto run
 function auto() {
     setInterval(function () {
-        document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keydown", { key: "1" }));
+        let res = Math.floor(Math.random() * 9) + 1
+        document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keydown", { key: res.toString() }));
         document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keydown", { key: "w" }));
         document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keyup", { key: "w" }));
         document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keydown", { key: " " }));

@@ -55,7 +55,7 @@
     } else { 
         wordSort = 0;
     }
-
+    info["Type"] = jsPsych.data.getURLVariable("type") ? jsPsych.data.getURLVariable("type") : 1;
     startPoint = 0;
     for (let i = 0; i < wordSort; i++) { 
         startPoint += arr[i];
@@ -106,12 +106,12 @@
                 document.getElementsByTagName("input")[1].addEventListener("input", function (a) {
                     let id = document.getElementsByTagName("input")[0].value + $("#group").val() + document.getElementsByTagName("input")[1].value.toString().padStart(3, "0");
                     document.getElementById("numberf").textContent = "你的最终编号是：" + id;
-                    info["index"] = id;
+                    info["subj_idx"] = id;
                 });
                 $("#group").change(function(){
                     let id = document.getElementsByTagName("input")[0].value + $("#group").val() + document.getElementsByTagName("input")[1].value.toString().padStart(3, "0");
                     document.getElementById("numberf").textContent = "你的最终编号是：" + id;
-                    info["index"] = id;
+                    info["subj_idx"] = id;
                 });
             }
         }, {
@@ -120,28 +120,10 @@
             html:"<p><input name='Q0' type='number' value=' ' required/></p>",
             button_label:"继续",
             on_finish: function (data) {
-                info["NumberOfExperiments"] = data.response.Q0;
+                info["Series"] = data.response.Q0;
             }
         }],
         on_finish: function () {
-            // // 判断本地储存当中是否有 实验编号，如果有 且 day ！= 1，就代表第二天
-            // if(localStorage.getItem(info["index"]) &&  (jsPsych.data.getURLVariable("day") && jsPsych.data.getURLVariable("day") != 1)) { 
-            //     info = JSON.parse(localStorage.getItem(info["index"]));
-            //     word_tmp = info["WordSurplus"];
-            // } else { 
-            //     // 否则就是第一天
-            //     if(!jsPsych.data.getURLVariable("debug")) { 
-            //         // debug 不移除index，便于测试实验
-            //         localStorage.removeItem(info["index"]);
-            //     } else if(localStorage.getItem(info["index"])) { 
-            //         // 是debug的话，并且 info存在，就调用
-            //         info = JSON.parse(localStorage.getItem(info["index"]));
-            //     }
-            //     let p = jsPsych.randomization.shuffle(getWord());
-            //     word_tmp = p.splice(group[0], group[1]);
-            //     info["WordSurplus"] = p;
-            // }
-            // 判断info是否完整
             if(Object.keys(info).length < 7) { 
                 timeline.push(begin_introduction(), SCTS_info_get());
             } else { 
