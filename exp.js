@@ -27,6 +27,98 @@ function SCTS_info_get() {
             on_finish: function (data) {
                 info["BirthYear"] = data.response.Q0;
             }
+        }, { // 出生地
+            type: 'survey-html-form',
+            preamble: "<p style = 'color : white;text-align: left;font-weight: 500;font-size: 22px;'>地址信息收集</p>",
+            html: `
+            <style>select{width: 130px;}</style>
+        <p>你出生所在地：<select id="bsf" data-type="b" data-content="sf">
+            <option value="1">选择省</option>
+        </select><select id="bsq" data-type="b" data-content="sq">
+            <option value="1">选择市</option>
+        </select><select id="bxx" data-type="b" data-content="xx">
+            <option value="1">选择区</option>
+        </select><br/>
+        出生户口类型：<input type="radio" name="BirthType" id="bCity"><label for="bCity">城市</label>
+        <input type="radio" name="BirthType" id="bCou"><label for="bCou">农村</label></p>
+        <p>你当前所在地：<select id="csf" data-type="c" data-content="sf">
+            <option value="1">选择省</option>
+        </select><select id="csq" data-type="c" data-content="sq">
+            <option value="1">选择市</option>
+        </select><select id="cxx" data-type="c" data-content="xx">
+            <option value="1">选择区</option>
+        </select><br/>
+        现在户口类型：<input type="radio" name="CurrType" id="cCity"><label for="cCity">城市</label>
+        <input type="radio" name="CurrType" id="cCou"><label for="cCou">农村</label></p>`,
+            button_label: '继续',
+            on_finish: function (data) {
+
+            },
+            on_load: function () {
+                // 加载数据
+                $.ajax({
+                    url: "getAddress.json",
+                    type: "get",
+                    dataType: "json",
+                    success: function (addresses) {
+                        // 省份信息添加
+                        $("select[data-content=sf]").empty();
+                        addresses.forEach((v, i) => {
+                            let option = $("<option>").val(i).text(v.text);
+                            $("select[data-content=sf]").append(option);
+                        });
+                        $("select[data-content=sf]").val(-1);
+                        $("#jspsych-survey-html-form-next").attr("disabled", true);
+
+                        let canGo = function () { 
+                            if(info["Birthplace"] && info["Currentplace"] && info["BirthType"] && info["CurrType"]) { 
+                                $("#jspsych-survey-html-form-next").attr("disabled", false);
+                            } else { 
+                                $("#jspsych-survey-html-form-next").attr("disabled", true);
+                            }
+                        }
+                        // 省份信息修改
+                        $("select[data-content=sf]").change(function () {
+                            // console.log($(this).val(), $(this).find("option:selected").text())
+                            let type = $(this).attr("data-type");
+                            let sele = $("select[data-content=sq][data-type=" + type + "]");
+                            sele.empty();
+                            addresses[$(this).val()].ChildNodes.forEach((v, i) => {
+                                let option = $("<option>").val(i).text(v.text);
+                                sele.append(option);
+                            });
+                            sele.val(-1);
+                            canGo();
+                        });
+                        // 市区信息修改
+                        $("select[data-content=sq]").change(function () {
+                            // console.log($(this).val(), $(this).find("option:selected").text())
+                            let type = $(this).attr("data-type");
+                            let sele = $("select[data-content=xx][data-type=" + type + "]");
+                            sele.empty();
+                            addresses[$("select[data-content=sf][data-type=" + type + "]").val()].ChildNodes[$(this).val()].ChildNodes.forEach((v, i) => {
+                                let option = $("<option>").val(i).text(v.text);
+                                sele.append(option);
+                            });
+                            sele.val(-1);
+                            canGo();
+                        });
+                        // 县乡信息修改
+                        $("select[data-content=xx]").change(function () {
+                            let type = $(this).attr("data-type");
+                            let province = $("select[data-content=sf][data-type=" + type + "]").find("option:selected").text(),
+                                city = $("select[data-content=sq][data-type=" + type + "]").find("option:selected").text(),
+                                area = $(this).find("option:selected").text();
+                            info[(type == "b" ? "Birthplace" : "Currentplace")] = province + city + area;
+                            canGo();
+                        });
+                        $("input").on("input", function() { 
+                            info[$(this).attr("name")] = $("label[for=" + $(this).attr("id") + "]").text();
+                            canGo();
+                        });
+                    }
+                });
+            }
         }, {
             type: 'survey-html-form',
             preamble: "<p style = 'color : white'>教育经历</p>",
@@ -85,7 +177,7 @@ function introducation_prac1() {
         </style>    \
 <div style='text-align: left'>\
 <p>您需要对给出的词语进行维度评分，在每次实验开始您会看到以下问题：</p> \
-<p class='example'>【单词】是否可以用于描述某个人的【维度】</p> \
+<p class='example'>【单词】可以用于描述某个人的【维度】</p> \
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
 <p class='example'>请表明您对该陈述的同意程度</p> \
 <p class='example'>（1=非常不同意，9=非常同意）</p> \
@@ -102,7 +194,7 @@ function introducation_prac1() {
         </style>    \
 <div style='text-align: left'>\
 <p>一个具体例子如下：</p> \
-<p class='example'>【温顺】是否可以用于描述某个人的【道德】</p> \
+<p class='example'>【温顺】可以用于描述某个人的【道德】</p> \
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
 <p class='example'>请表明您对该陈述的同意程度</p> \
 <p class='example'>（1=非常不同意，9=非常同意）</p> \
@@ -150,17 +242,23 @@ function introducation_prac2() {
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
 <p class='example'>请表明您对该单词的积极/消极程度评分 </p> \
 <p class='example'>（1=非常消极，9=非常积极）</p> \
- \
+<p>如果您明白了，请按 <strong>继续</strong> 查看示例。</p> \
+\
+</div>", "<div class='contacts'>   <p class='title' style='color:#fff'>效度评分</p> <div style='color: white;'class='content_box'>\
+<style>" + ss + "\
+</style>    \
+<div style='text-align: left'> \
+<p>一个具体例子如下：</p> \
 <p>您需要对词语的积极/消极程度进行1-9分的评分，其中1分表示非常消极，9分表示非常积极。例如：</p> \
 <p class='example'>【温顺】</p> \
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
 <p class='example'>请表明您对该单词的积极/消极程度评分</p> \
-<p class='example'>（1=非常消极，5=中性词，9=非常积极）</p> \
- \
+<p class='example'>（1=非常消极，9=非常积极）</p> \
+\
 <p>如果您明白了，请按 <strong>继续</strong> 进行正式实验。</p> \
 <p>如果您还有疑问，请咨询实验人员。</p> \
 \
-</div>",
+</div>"
         ],
         show_clickable_nav: true,
         allow_backward: false,
@@ -168,6 +266,7 @@ function introducation_prac2() {
         button_label_next: "继续",
     }
 }
+// 陷阱题
 
 // 主体程序
 function start() {
@@ -186,18 +285,33 @@ function start() {
                     len: p[j].length,
                     dimensionGroup: (i + 1).toString(),
                     wordGroup: Math.floor(tmpWord.length / word_block_num).toString(),
-                    serial: j
+                    serial: j,
+                    isTrap: false
                 });
             }
             variable.push(a);
         }
     }
+    // console.log(jsPsych.utils.deepCopy(variable));
+    // 陷阱题
+    let trap1 = [
+        {word: "【西安】是否可以用于描述中国的【首都】", isTrap: true},
+        {word: "【月球】是否可以用于描述人类当前居住的【星球】", isTrap: true}
+    ];
+    let trap2 = [
+        {word: "请在本题选择第六个选项", isTrap: true}
+    ]
+
     let prac1 = {
         type: 'survey-multi-choice',
         questions: [
             {
                 prompt: function () {
-                    return '<p id="text">【' + jsPsych.timelineVariable("word") + '】是否可以用于描述某个人的【' + jsPsych.timelineVariable("dimension") + '】</p>';
+                    return isTrap ? jsPsych.timelineVariable("word", true) : 
+                        '<p id="text">【' + 
+                            jsPsych.timelineVariable("word", true) + 
+                            '】可以用于描述某个人的【' + jsPsych.timelineVariable("dimension", true) + 
+                            '】</p>';
                 }, options: [1, 2, 3, 4, 5, 6, 7, 8, 9], horizontal: true
             }
         ],
@@ -212,10 +326,21 @@ function start() {
 
             // 隐藏 continue 按钮
             document.getElementById("jspsych-survey-multi-choice-next").style.visibility = "hidden";
+            $("#jspsych-progressbar-container").css("visibility", "hidden")
 
+            let describe = {
+                "能力": "用于描述人可用来完成某一项目标或者任务的综合素质（这里的目标和任务不包括人际交往）",
+                "道德": "用于描述人的道德品格或道德品质",
+                "外貌": "用于描述人的长相、身材等",
+                "社交能力": "用于描述人的人际交往能力",
+                "社会经济地位": "用于描述人的社会地位和经济水平等"
+            }, dime = jsPsych.timelineVariable("dimension", true);
             // 创建下方提示语
             let p = document.createElement("p");
-            p.innerHTML = "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
+            p.innerHTML = isTrap ? "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）" : 
+                "<span style='position: absolute;bottom: 3em;left: calc(50% - 450px);width: 900px;font-weight: 100;'>" +
+                    dime + ":" + describe[dime] +
+                    "</span><br/>请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
             p.style = "font-size: 20px; font-weight: normal;";
             document.getElementById("jspsych-content").appendChild(p);
 
@@ -244,15 +369,9 @@ function start() {
             data.dimensionGroup = jsPsych.timelineVariable("dimensionGroup", true); // 维度组
             data.serial = jsPsych.timelineVariable("serial", true); // 序列号
 
-            data.subIdx = info["index"];
-            data.NumberOfExperiments = info["NumberOfExperiments"];
-            data.Name = info["Name"];
-            data.Sex = info["Sex"];
-            data.Education = info["Education"];
-            data.BirthYear = info["BirthYear"];
-
             data.rating = data.response.Q0; // 维度评分
             data.type = parseInt(jsPsych.data.getURLVariable("type"));
+            data.isTrap = jsPsych.timelineVariable("isTrap", true);
             // 给窗口初始化
             $("body").unbind();
             clearTimeout(timeout);
@@ -325,14 +444,9 @@ function start() {
         },
         on_finish: function (data) {
             // 分值的呈现
+            data.isTrap = jsPsych.timelineVariable("isTrap", true); // 是否是陷阱题
             data.validity = data.response.Q0; // 点击 效价分数
             data.word = jsPsych.timelineVariable("word", true); // 单词
-            data.subIdx = info["index"]; // 实验id
-            data.NumberOfExperiments = info["NumberOfExperiments"]; // 实验次数
-            data.Name = info["Name"]; // 姓名
-            data.Sex = info["Sex"];
-            data.Education = info["Education"];
-            data.BirthYear = info["BirthYear"];
 
             $("body").unbind();
             clearTimeout(timeout);
@@ -364,9 +478,9 @@ function start() {
         on_finish: function () {
             mupsyEnd({
                 data: jsPsych.data.get().filter({ save: true }).addToAll(info).filterColumns(
-                    ["subj_idx", "Name", "Sex", "Education", "BirthYear", "Type", 
-                    "word", "wordLen", "wordGroup", "dimension", "dimensionGroup", 
-                    "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]
+                    ["subj_idx", "Name", "Sex", "Education", "Birthplace", "BirthType", "Currentplace", "CurrType", "BirthYear", "Type",
+                        "word", "wordLen", "wordGroup", "dimension", "dimensionGroup",
+                        "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]
                 ),
                 name: "SCTS",
                 end_html: "感谢你参与本次实验，本次实验到这里就结束了",
