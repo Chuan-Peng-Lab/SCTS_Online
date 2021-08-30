@@ -63,7 +63,7 @@
     word_tmp = getWord().splice(startPoint, arr[wordSort]);
         
     if (jsPsych.data.getURLVariable("debug")) {
-        version = "t1"
+        version = "t3"
         debug = true;
         // 调试参数
         word_block_num = 5;

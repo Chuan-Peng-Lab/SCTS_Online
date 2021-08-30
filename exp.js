@@ -292,22 +292,22 @@ function start() {
             variable.push(a);
         }
     }
-    // console.log(jsPsych.utils.deepCopy(variable));
+    variable = jsPsych.randomization.shuffle(variable);
     // 陷阱题
     let trap1 = [
         {word: "【西安】是否可以用于描述中国的【首都】", isTrap: true},
         {word: "【月球】是否可以用于描述人类当前居住的【星球】", isTrap: true}
     ];
-    let trap2 = [
-        {word: "请在本题选择第六个选项", isTrap: true}
-    ]
+    trap1.forEach((v, i) => {
+        variable[variable.length - 1 - i * 3].splice(0,0,v);
+    });
 
     let prac1 = {
         type: 'survey-multi-choice',
         questions: [
             {
                 prompt: function () {
-                    return isTrap ? jsPsych.timelineVariable("word", true) : 
+                    return jsPsych.timelineVariable("isTrap", true) ? jsPsych.timelineVariable("word", true) : 
                         '<p id="text">【' + 
                             jsPsych.timelineVariable("word", true) + 
                             '】可以用于描述某个人的【' + jsPsych.timelineVariable("dimension", true) + 
@@ -337,7 +337,7 @@ function start() {
             }, dime = jsPsych.timelineVariable("dimension", true);
             // 创建下方提示语
             let p = document.createElement("p");
-            p.innerHTML = isTrap ? "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）" : 
+            p.innerHTML = jsPsych.timelineVariable("isTrap", true) ? "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）" : 
                 "<span style='position: absolute;bottom: 3em;left: calc(50% - 450px);width: 900px;font-weight: 100;'>" +
                     dime + ":" + describe[dime] +
                     "</span><br/>请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
@@ -383,7 +383,7 @@ function start() {
     };
     timeline.push(introducation_prac1(), {
         timeline: [prac1],
-        timeline_variables: jsPsych.randomization.shuffle(variable.splice(Math.floor(Math.random() * variable.length), 1))[0]
+        timeline_variables: jsPsych.randomization.shuffle(variable.splice(0,1)[0])
     });
     while (variable.length > 0) {
         timeline.push({
@@ -392,20 +392,30 @@ function start() {
             choices: [" "]
         }, {
             timeline: [prac1],
-            timeline_variables: jsPsych.randomization.shuffle(variable.splice(Math.floor(Math.random() * variable.length), 1))[0]
+            timeline_variables: jsPsych.randomization.shuffle(variable.splice(0,1)[0])
         });
     }
 
     // 第二部分 效价打分
     // 定义一下第二个单词block,防止时间线变量为空
+    let trap2 = [
+        {word: "请在本题选择第六个选项", isTrap: true}
+    ]
     variable = [];
     for (let i = 0; i < word_tmp.length; i++) {
         variable.push({
             word: word_tmp[i],
-            len: word_tmp[i].length
+            len: word_tmp[i].length,
+            isTrap: false
         });
     }
     variable = jsPsych.randomization.shuffle(variable);
+    window.dd = jsPsych.utils.deepCopy(variable);
+    trap2.forEach(v => {
+        let half = Math.floor(window.dd.length / 2),
+            deviation = Math.floor(Math.random() * (variable.length - half));
+        variable.splice(0, 0, v);
+    });
     let prac2 = {
         type: 'survey-multi-choice',
         questions: [
@@ -420,7 +430,7 @@ function start() {
 
             // 创建下方提示语
             let p = document.createElement("p");
-            p.innerHTML = "请表明你对该单词的积极/消极程度评分<br/>（1 = 非常消极，9 = 非常积极）";
+            p.innerHTML = jsPsych.timelineVariable("isTrap", true) ? "请您完成上述操作" : "请表明你对该单词的积极/消极程度评分<br/>（1 = 非常消极，9 = 非常积极）";
             p.style = "font-size: 20px; font-weight: normal;";
             document.getElementById("jspsych-content").appendChild(p);
 
@@ -479,7 +489,7 @@ function start() {
             mupsyEnd({
                 data: jsPsych.data.get().filter({ save: true }).addToAll(info).filterColumns(
                     ["subj_idx", "Name", "Sex", "Education", "Birthplace", "BirthType", "Currentplace", "CurrType", "BirthYear", "Type",
-                        "word", "wordLen", "wordGroup", "dimension", "dimensionGroup",
+                        "isTrap", "word", "wordLen", "wordGroup", "dimension", "dimensionGroup",
                         "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]
                 ),
                 name: "SCTS",
