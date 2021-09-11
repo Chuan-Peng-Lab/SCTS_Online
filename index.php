@@ -39,7 +39,13 @@
     let blank = 500; // 每个trial之间的空白屏时间 单位 毫秒
 
     let dimension = ["能力", "道德", "社交能力", "外貌", "社会经济地位"]; // 需要维度评分的维度
-
+    let dimEn = {
+        "能力": "ability",
+        "道德": "morality",
+        "社交能力": "socialAbility",
+        "外貌": "appearance",
+        "社会经济地位": "socioEconomicStatus"
+    }
     // 以下非实验参数，最好不改
     let debug = false;
     let word_tmp; // 保存 当天需要的单词数量

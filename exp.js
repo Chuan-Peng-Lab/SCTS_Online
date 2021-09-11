@@ -365,6 +365,7 @@ function start() {
             data.word = jsPsych.timelineVariable("word", true); // 单词
             data.wordLen = jsPsych.timelineVariable("len", true); // 单词长度
             data.dimension = jsPsych.timelineVariable("dimension", true); // 维度 能力/
+            data.dimensionEn = dimEn[data.dimension]; // 维度 能力/
             data.wordGroup = jsPsych.timelineVariable("wordGroup", true); // 单词组
             data.dimensionGroup = jsPsych.timelineVariable("dimensionGroup", true); // 维度组
             data.serial = jsPsych.timelineVariable("serial", true); // 序列号
