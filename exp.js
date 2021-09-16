@@ -184,7 +184,7 @@ function introducation_prac1() {
 \
 <p>其中【维度】是从能力, 道德, 社交能力, 外貌, 社会经济地位五个维度中随机选出的，您需要对该段描述进行1-9分的评分，其中1分表示非常不同意，9分表示非常同意。</p> \
 <p>其中：</p> \
-<p>道德：用于描述人的道德品格或道德品质</p> \
+<p>道德：用于描述人的道德品格或道德品质（包括积极与消极）</p> \
 <p>能力：用于描述人可用来完成某一项目标或者任务的综合素质（这里的目标和任务不包括人际交往）</p> \
 <p>社交能力：用于描述人的人际交往能力</p> \
 <p>外貌：用于描述人的长相、身材等</p> \
@@ -194,11 +194,12 @@ function introducation_prac1() {
         </style>    \
 <div style='text-align: left'>\
 <p>一个具体例子如下：</p> \
-<p class='example'>【温顺】可以用于描述某个人的【道德】</p> \
+<p class='example'>【形单影只】可以用于描述某个人的【外貌】</p> \
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
 <p class='example'>请表明您对该陈述的同意程度</p> \
 <p class='example'>（1=非常不同意，9=非常同意）</p> \
 \
+<p><span style='position: absolute;bottom: 3em;left: calc(50% - 450px);width: 900px;font-weight: 100;text-align: center;'>外貌：用于描述人的长相、身材等</span></p> \
 <p>如果您已经明白本研究的任务，请按 <strong>继续</strong> 开始正式实验。</p> \
 <p>如果您还有疑问，请咨询实验人员。</p> \
 </div>"
@@ -238,9 +239,9 @@ function introducation_prac2() {
         </style>    \
 <div style='text-align: left'> \
 <p>您需要对给出的词语是否消极或者积极进行评分，在每次实验开始您会看到以下问题：</p> \
-<p class='example'>【单词】</p> \
+<p class='example'>【词语】</p> \
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
-<p class='example'>请表明您对该单词的积极/消极程度评分 </p> \
+<p class='example'>请表明您对该词语的积极/消极程度评分 </p> \
 <p class='example'>（1=非常消极，9=非常积极）</p> \
 <p>如果您明白了，请按 <strong>继续</strong> 查看示例。</p> \
 \
@@ -249,7 +250,6 @@ function introducation_prac2() {
 </style>    \
 <div style='text-align: left'> \
 <p>一个具体例子如下：</p> \
-<p>您需要对词语的积极/消极程度进行1-9分的评分，其中1分表示非常消极，9分表示非常积极。例如：</p> \
 <p class='example'>【温顺】</p> \
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
 <p class='example'>请表明您对该单词的积极/消极程度评分</p> \
