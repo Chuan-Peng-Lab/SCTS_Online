@@ -194,12 +194,8 @@ function introducation_prac1() {
         </style>    \
 <div style='text-align: left'>\
 <p>一个具体例子如下：</p> \
-<p class='example'>【形单影只】可以用于描述某个人的【外貌】</p> \
-<p class='example'>1  2  3  4  5  6  7  8  9 </p> \
-<p class='example'>请表明您对该陈述的同意程度</p> \
-<p class='example'>（1=非常不同意，9=非常同意）</p> \
+<p class='example'><img src='sample.png' /></p>\
 \
-<p><span style='position: absolute;bottom: 3em;left: calc(50% - 450px);width: 900px;font-weight: 100;text-align: center;'>外貌：用于描述人的长相、身材等</span></p> \
 <p>如果您已经明白本研究的任务，请按 <strong>继续</strong> 开始正式实验。</p> \
 <p>如果您还有疑问，请咨询实验人员。</p> \
 </div>"
@@ -250,10 +246,7 @@ function introducation_prac2() {
 </style>    \
 <div style='text-align: left'> \
 <p>一个具体例子如下：</p> \
-<p class='example'>【温顺】</p> \
-<p class='example'>1  2  3  4  5  6  7  8  9 </p> \
-<p class='example'>请表明您对该单词的积极/消极程度评分</p> \
-<p class='example'>（1=非常消极，9=非常积极）</p> \
+<p class='example'><img src='sample2.png' /></p>\
 \
 <p>如果您明白了，请按 <strong>继续</strong> 进行正式实验。</p> \
 <p>如果您还有疑问，请咨询实验人员。</p> \
