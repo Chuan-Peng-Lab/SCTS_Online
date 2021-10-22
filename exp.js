@@ -177,10 +177,11 @@ function introducation_prac1() {
         </style>    \
 <div style='text-align: left'>\
 <p>您需要对给出的词语进行维度评分，在每次实验开始您会看到以下问题：</p> \
-<p class='example'>【单词】可以用于描述某个人的【维度】</p> \
+<p class='example'>【词语】可以用于描述某个人的【维度】</p> \
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
 <p class='example'>请表明您对该陈述的同意程度</p> \
 <p class='example'>（1=非常不同意，9=非常同意）</p> \
+<p class='example'><br/>维度定义</p> \
 \
 <p>其中【维度】是从能力, 道德, 社交能力, 外貌, 社会经济地位五个维度中随机选出的，您需要对该段描述进行1-9分的评分，其中1分表示非常不同意，9分表示非常同意。</p> \
 <p>其中：</p> \
@@ -319,7 +320,6 @@ function start() {
 
             // 隐藏 continue 按钮
             document.getElementById("jspsych-survey-multi-choice-next").style.visibility = "hidden";
-            $("#jspsych-progressbar-container").css("visibility", "hidden")
 
             let describe = {
                 "能力": "用于描述人可用来完成某一项目标或者任务的综合素质（这里的目标和任务不包括人际交往）",
@@ -424,7 +424,7 @@ function start() {
 
             // 创建下方提示语
             let p = document.createElement("p");
-            p.innerHTML = jsPsych.timelineVariable("isTrap", true) ? "请您完成上述操作" : "请表明你对该单词的积极/消极程度评分<br/>（1 = 非常消极，9 = 非常积极）";
+            p.innerHTML = jsPsych.timelineVariable("isTrap", true) ? "请您完成上述操作" : "请表明你对该词语的积极/消极程度评分<br/>（1 = 非常消极，9 = 非常积极）";
             p.style = "font-size: 20px; font-weight: normal;";
             document.getElementById("jspsych-content").appendChild(p);
 
@@ -483,7 +483,7 @@ function start() {
             mupsyEnd({
                 data: jsPsych.data.get().filter({ save: true }).addToAll(info).filterColumns(
                     ["subj_idx", "Name", "Sex", "Education", "Birthplace", "BirthType", "Currentplace", "CurrType", "BirthYear", "Type",
-                        "isTrap", "word", "wordLen", "wordGroup", "dimension", "dimensionGroup",
+                        "isTrap", "word", "wordLen", "wordGroup", "dimension", "dimensionEn", "dimensionGroup",
                         "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]
                 ),
                 name: "SCTS",
