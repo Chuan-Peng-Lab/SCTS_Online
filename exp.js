@@ -346,12 +346,13 @@ function start() {
 
             $("input[type=radio]").on("input", function (a) {
                 // 判断是否全部选择了
-                if ($("input[type=radio]:checked").length > 0) {
-                    document.getElementById("jspsych-survey-multi-choice-next").style.visibility = "visible";
-                }
+                $("#jspsych-survey-multi-choice-next").attr("choose", "1");
             });
             $("body").keydown(function (a) {
                 let key = a.originalEvent.key;
+                if(key == " " & parseInt($("#jspsych-survey-multi-choice-next").attr("choose"))) {
+                    $("#jspsych-survey-multi-choice-next").click();
+                }
                 if (parseInt(key) > 0) {
                     $("input[type=radio]")[parseInt(key) - 1].click();
                 }
@@ -440,8 +441,16 @@ function start() {
                 }
             });
 
+
+            $("input[type=radio]").on("input", function (a) {
+                // 判断是否全部选择了
+                $("#jspsych-survey-multi-choice-next").attr("choose", "1");
+            });
             $("body").keydown(function (a) {
                 let key = a.originalEvent.key;
+                if(key == " " & parseInt($("#jspsych-survey-multi-choice-next").attr("choose"))) {
+                    $("#jspsych-survey-multi-choice-next").click();
+                }
                 if (parseInt(key) > 0) {
                     $("input[type=radio]")[parseInt(key) - 1].click();
                 }
