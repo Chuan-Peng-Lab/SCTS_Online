@@ -57,14 +57,15 @@ function SCTS_info_get() {
             on_load: function () {
                 // 加载数据
                 $.ajax({
-                    url: "getAddress.json",
+                    url: "newAddress.json",
                     type: "get",
                     dataType: "json",
                     success: function (addresses) {
                         // 省份信息添加
                         $("select[data-content=sf]").empty();
-                        addresses.forEach((v, i) => {
-                            let option = $("<option>").val(i).text(v.text);
+
+                        Object.keys(addresses["0"]).forEach((v, i) => {
+                            let option = $("<option>").val(v).text(addresses["0"][v]);
                             $("select[data-content=sf]").append(option);
                         });
                         $("select[data-content=sf]").val(-1);
@@ -83,8 +84,10 @@ function SCTS_info_get() {
                             let type = $(this).attr("data-type");
                             let sele = $("select[data-content=sq][data-type=" + type + "]");
                             sele.empty();
-                            addresses[$(this).val()].ChildNodes.forEach((v, i) => {
-                                let option = $("<option>").val(i).text(v.text);
+
+                            let c = addresses["0," + $(this).val()];
+                            Object.keys(c).forEach((v,i) => {
+                                let option = $("<option>").val(v).text(c[v]);
                                 sele.append(option);
                             });
                             sele.val(-1);
@@ -96,8 +99,10 @@ function SCTS_info_get() {
                             let type = $(this).attr("data-type");
                             let sele = $("select[data-content=xx][data-type=" + type + "]");
                             sele.empty();
-                            addresses[$("select[data-content=sf][data-type=" + type + "]").val()].ChildNodes[$(this).val()].ChildNodes.forEach((v, i) => {
-                                let option = $("<option>").val(i).text(v.text);
+
+                            let c = addresses["0," + $("select[data-content=sf][data-type=" + type + "]").val() + "," + $("select[data-content=sq][data-type=" + type + "]").val()]
+                            Object.keys(c).forEach((v,i) => {
+                                let option = $("<option>").val(v).text(c[v]);
                                 sele.append(option);
                             });
                             sele.val(-1);
@@ -144,6 +149,8 @@ function SCTS_info_get() {
             func: function () {
                 localStorage.removeItem(info["index"]);
                 localStorage.setItem(info["index"], JSON.stringify(info));
+
+                $("#jspsych-progressbar-container span").css("visibility", "hidden");
             }
         }]
     }
@@ -340,10 +347,7 @@ function start() {
             $("input[type=radio]").on("input", function (a) {
                 // 判断是否全部选择了
                 if ($("input[type=radio]:checked").length > 0) {
-                    if (timeout != 0) { clearTimeout(timeout); timeout = 0; }
-                    timeout = setTimeout(function () {
-                        $("#jspsych-survey-multi-choice-next").click()
-                    }, delay);
+                    document.getElementById("jspsych-survey-multi-choice-next").style.visibility = "visible";
                 }
             });
             $("body").keydown(function (a) {
@@ -432,10 +436,7 @@ function start() {
                 // 判断是否全部选择了
                 // 如果全部选择了，则延迟1秒跳转
                 if ($("input[type=radio]:checked").length > 0) {
-                    if (timeout != 0) { clearTimeout(timeout); timeout = 0; }
-                    timeout = setTimeout(function () {
-                        $("#jspsych-survey-multi-choice-next").click()
-                    }, delay);
+                    document.getElementById("jspsych-survey-multi-choice-next").style.visibility = "visible";
                 }
             });
 

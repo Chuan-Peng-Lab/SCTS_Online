@@ -1202,7 +1202,7 @@ window.jsPsych = (function() {
     function drawProgressBar(msg) {
       document.querySelector('.jspsych-display-element').insertAdjacentHTML('beforeend',
         '<div id="jspsych-progressbar-container">'+
-        '<span>'+
+        '<span id="jspsych-progressbar-container-span">'+
         msg+ 
         '</span>'+
         '<div id="jspsych-progressbar-outer">'+
