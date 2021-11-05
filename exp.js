@@ -57,15 +57,14 @@ function SCTS_info_get() {
             on_load: function () {
                 // 加载数据
                 $.ajax({
-                    url: "newAddress.json",
+                    url: "getAddress.json",
                     type: "get",
                     dataType: "json",
                     success: function (addresses) {
                         // 省份信息添加
                         $("select[data-content=sf]").empty();
-
-                        Object.keys(addresses["0"]).forEach((v, i) => {
-                            let option = $("<option>").val(v).text(addresses["0"][v]);
+                        Object.keys(addresses).forEach((v, i) => {
+                            let option = $("<option>").val(v).text(v);
                             $("select[data-content=sf]").append(option);
                         });
                         $("select[data-content=sf]").val(-1);
@@ -85,9 +84,9 @@ function SCTS_info_get() {
                             let sele = $("select[data-content=sq][data-type=" + type + "]");
                             sele.empty();
 
-                            let c = addresses["0," + $(this).val()];
+                            let c = addresses[$(this).val()];
                             Object.keys(c).forEach((v,i) => {
-                                let option = $("<option>").val(v).text(c[v]);
+                                let option = $("<option>").val(v).text(v);
                                 sele.append(option);
                             });
                             sele.val(-1);
@@ -100,7 +99,7 @@ function SCTS_info_get() {
                             let sele = $("select[data-content=xx][data-type=" + type + "]");
                             sele.empty();
 
-                            let c = addresses["0," + $("select[data-content=sf][data-type=" + type + "]").val() + "," + $("select[data-content=sq][data-type=" + type + "]").val()]
+                            let c = addresses[$("select[data-content=sf][data-type=" + type + "]").val()][$("select[data-content=sq][data-type=" + type + "]").val()];
                             Object.keys(c).forEach((v,i) => {
                                 let option = $("<option>").val(v).text(c[v]);
                                 sele.append(option);
@@ -124,7 +123,7 @@ function SCTS_info_get() {
                     }
                 });
             }
-        }, {
+        },  {
             type: 'survey-html-form',
             preamble: "<p style = 'color : white'>教育经历</p>",
             html: `
