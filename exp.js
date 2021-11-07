@@ -299,7 +299,8 @@ function start() {
         {word: "【月球】是否可以用于描述人类当前居住的【星球】", isTrap: true}
     ];
     trap1.forEach((v, i) => {
-        variable[variable.length - 1 - i * 3].splice(0,0,v);
+        variable[variable.length - 1 - i * 3].splice(Math.floor(Math.random() * (variable[variable.length - 1 - i * 3].length)),0,v);
+        // console.log(jsPsych.utils.deepCopy(variable));
     });
 
     let prac1 = {
@@ -410,9 +411,10 @@ function start() {
     variable = jsPsych.randomization.shuffle(variable);
     window.dd = jsPsych.utils.deepCopy(variable);
     trap2.forEach(v => {
-        let half = Math.floor(window.dd.length / 2),
-            deviation = Math.floor(Math.random() * (variable.length - half));
-        variable.splice(0, 0, v);
+        let half = Math.floor(window.dd.length / 2);
+        let deviation = Math.floor(Math.random() * (variable.length - half));
+        variable.splice(half + deviation, 0, v);
+        console.log(jsPsych.utils.deepCopy(variable));
     });
     let prac2 = {
         type: 'survey-multi-choice',
