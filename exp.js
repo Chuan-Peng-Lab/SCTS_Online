@@ -246,7 +246,7 @@ function introducation_prac2() {
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
 <p class='example'>请表明您对该词语的积极/消极程度评分 </p> \
 <p class='example'>（1=非常消极，9=非常积极）</p> \
-<p>您需要对词语的积极/消极程度进行1-9分的评分，其中1分表示非常消极，9分表示非常积极。</p>\
+<p>您需要对词语的积极/消极程度进行1-9分的评分，其中1分表示非常消极，9分表示非常积极，在每次评分后请按 “空格键” 继续。</p>\
 <p>如果您明白了，请按 <strong>继续</strong> 查看示例。</p> \
 \
 </div>", "<div class='contacts'>   <p class='title' style='color:#fff'>效度评分</p> <div style='color: white;'class='content_box'>\
