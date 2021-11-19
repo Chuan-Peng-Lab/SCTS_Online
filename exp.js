@@ -368,6 +368,7 @@ function start() {
             data.wordGroup = jsPsych.timelineVariable("wordGroup", true); // 单词组
             data.dimensionGroup = jsPsych.timelineVariable("dimensionGroup", true); // 维度组
             data.serial = jsPsych.timelineVariable("serial", true); // 序列号
+            data.blockNum = blockNum; // block 数量
 
             data.rating = data.response.Q0; // 维度评分
             data.type = parseInt(jsPsych.data.getURLVariable("type"));
@@ -382,6 +383,11 @@ function start() {
         }
     };
     timeline.push(introducation_prac1(), {
+        type: "call-function",
+        func: function() { 
+            blockNum = 1;
+        }
+    }, {
         timeline: [prac1],
         timeline_variables: jsPsych.randomization.shuffle(variable.splice(0,1)[0])
     });
@@ -390,6 +396,11 @@ function start() {
             type: "html-keyboard-response",
             stimulus: "<p>休息一下吧，但<strong>请注意，下一个评价的维度与之前不一致</strong></p><p>按 空格键 继续</p>",
             choices: [" "]
+        }, {
+            type: "call-function",
+            func: function() { 
+                blockNum += 1;
+            }
         }, {
             timeline: [prac1],
             timeline_variables: jsPsych.randomization.shuffle(variable.splice(0,1)[0])
@@ -463,6 +474,7 @@ function start() {
             data.isTrap = jsPsych.timelineVariable("isTrap", true); // 是否是陷阱题
             data.validity = data.response.Q0; // 点击 效价分数
             data.word = jsPsych.timelineVariable("word", true); // 单词
+            data.blockNum = blockNum; // block数量
 
             $("body").unbind();
             clearTimeout(timeout);
@@ -474,6 +486,11 @@ function start() {
     };
 
     timeline.push(introducation_prac2(), {
+        type: "call-function",
+        func: function() { 
+            blockNum += 1;
+        }
+    }, {
         timeline: [prac2],
         timeline_variables: variable.splice(0, (variable.length < word_block_num) ? variable.length : word_block_num)
     });
@@ -482,6 +499,11 @@ function start() {
             type: "html-keyboard-response",
             stimulus: "<p>休息一下吧</p><p>按 空格键 继续</p>",
             choices: [" "]
+        }, {
+            type: "call-function",
+            func: function() { 
+                blockNum += 1;
+            }
         }, {
             timeline: [prac2],
             timeline_variables: variable.splice(0, Math.min(word_block_num, variable.length))
@@ -495,7 +517,7 @@ function start() {
             mupsyEnd({
                 data: jsPsych.data.get().filter({ save: true }).addToAll(info).filterColumns(
                     ["subj_idx", "Name", "Sex", "Education", "Birthplace", "BirthType", "Currentplace", "CurrType", "BirthYear", "Type",
-                        "isTrap", "word", "wordLen", "wordGroup", "dimension", "dimensionEn", "dimensionGroup",
+                        "isTrap", "word", "wordLen", "wordGroup", "dimension", "dimensionEn", "dimensionGroup", "blockNum", 
                         "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]
                 ),
                 name: "SCTS",

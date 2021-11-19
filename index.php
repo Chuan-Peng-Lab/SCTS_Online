@@ -53,6 +53,7 @@
     let info = {}; // 保存被试信息
     let variable = []; // 时间线变量
     let timeout = 0; // 记录 setTimeout
+    let blockNum = 0; // 记录block试次数量
 
     let wordSort, startPoint;
     let arr = [318, 319, 318, 319, 318, 319];
