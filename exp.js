@@ -296,8 +296,8 @@ function start() {
     variable = jsPsych.randomization.shuffle(variable);
     // 陷阱题
     let trap1 = [
-        {word: "【西安】是否可以用于描述中国的【首都】", isTrap: true},
-        {word: "【月球】是否可以用于描述人类当前居住的【星球】", isTrap: true}
+        {word: "【西安】可以用于描述中国的【首都】", isTrap: true},
+        {word: "【月球】可以用于描述人类当前居住的【星球】", isTrap: true}
     ];
     trap1.forEach((v, i) => {
         variable[variable.length - 1 - i * 3].splice(Math.floor(Math.random() * (variable[variable.length - 1 - i * 3].length)),0,v);
@@ -339,7 +339,7 @@ function start() {
             // 创建下方提示语
             let p = document.createElement("p");
             p.innerHTML = jsPsych.timelineVariable("isTrap", true) ? "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）" : 
-                "<span style='position: absolute;bottom: 3em;left: calc(50% - 450px);width: 900px;font-weight: 100;'>" +
+                "<span style='position: absolute;bottom: 11em;left: calc(50% - 450px);width: 900px;font-weight: 100;'>" +
                     dime + ":" + describe[dime] +
                     "</span><br/>请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
             p.style = "font-size: 20px; font-weight: normal;";

@@ -25,7 +25,7 @@
 <script type="text/javascript">
     document.title = "SCTS";
     // 实验参数
-    let version = "v3";
+    let version = "v4";
     let exper_number = "SEV";
     let word_block_num = 80; // 单个block的单词数量
     let word_day = 320; // 第一天的单词数量
