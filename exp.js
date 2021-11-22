@@ -70,10 +70,10 @@ function SCTS_info_get() {
                         $("select[data-content=sf]").val(-1);
                         $("#jspsych-survey-html-form-next").attr("disabled", true);
 
-                        let canGo = function () { 
-                            if(info["Birthplace"] && info["Currentplace"] && info["BirthType"] && info["CurrType"]) { 
+                        let canGo = function () {
+                            if (info["Birthplace"] && info["Currentplace"] && info["BirthType"] && info["CurrType"]) {
                                 $("#jspsych-survey-html-form-next").attr("disabled", false);
-                            } else { 
+                            } else {
                                 $("#jspsych-survey-html-form-next").attr("disabled", true);
                             }
                         }
@@ -85,7 +85,7 @@ function SCTS_info_get() {
                             sele.empty();
 
                             let c = addresses[$(this).val()];
-                            Object.keys(c).forEach((v,i) => {
+                            Object.keys(c).forEach((v, i) => {
                                 let option = $("<option>").val(v).text(v);
                                 sele.append(option);
                             });
@@ -100,7 +100,7 @@ function SCTS_info_get() {
                             sele.empty();
 
                             let c = addresses[$("select[data-content=sf][data-type=" + type + "]").val()][$("select[data-content=sq][data-type=" + type + "]").val()];
-                            Object.keys(c).forEach((v,i) => {
+                            Object.keys(c).forEach((v, i) => {
                                 let option = $("<option>").val(v).text(c[v]);
                                 sele.append(option);
                             });
@@ -116,14 +116,14 @@ function SCTS_info_get() {
                             info[(type == "b" ? "Birthplace" : "Currentplace")] = province + city + area;
                             canGo();
                         });
-                        $("input").on("input", function() { 
+                        $("input").on("input", function () {
                             info[$(this).attr("name")] = $("label[for=" + $(this).attr("id") + "]").text();
                             canGo();
                         });
                     }
                 });
             }
-        },  {
+        }, {
             type: 'survey-html-form',
             preamble: "<p style = 'color : white'>教育经历</p>",
             html: `
@@ -296,11 +296,11 @@ function start() {
     variable = jsPsych.randomization.shuffle(variable);
     // 陷阱题
     let trap1 = [
-        {word: "【西安】可以用于描述中国的【首都】", isTrap: true},
-        {word: "【月球】可以用于描述人类当前居住的【星球】", isTrap: true}
+        { word: "【西安】可以用于描述中国的【首都】", isTrap: true },
+        { word: "【月球】可以用于描述人类当前居住的【星球】", isTrap: true }
     ];
     trap1.forEach((v, i) => {
-        variable[variable.length - 1 - i * 3].splice(Math.floor(Math.random() * (variable[variable.length - 1 - i * 3].length)),0,v);
+        variable[variable.length - 1 - i * 3].splice(Math.floor(Math.random() * (variable[variable.length - 1 - i * 3].length)), 0, v);
         // console.log(jsPsych.utils.deepCopy(variable));
     });
 
@@ -309,11 +309,11 @@ function start() {
         questions: [
             {
                 prompt: function () {
-                    return jsPsych.timelineVariable("isTrap", true) ? jsPsych.timelineVariable("word", true) : 
-                        '<p id="text">【' + 
-                            jsPsych.timelineVariable("word", true) + 
-                            '】可以用于描述某个人的【' + jsPsych.timelineVariable("dimension", true) + 
-                            '】</p>';
+                    return jsPsych.timelineVariable("isTrap", true) ? jsPsych.timelineVariable("word", true) :
+                        '<p id="text">【' +
+                        jsPsych.timelineVariable("word", true) +
+                        '】可以用于描述某个人的【' + jsPsych.timelineVariable("dimension", true) +
+                        '】</p>';
                 }, options: [1, 2, 3, 4, 5, 6, 7, 8, 9], horizontal: true
             }
         ],
@@ -328,7 +328,8 @@ function start() {
 
             // 隐藏 continue 按钮
             document.getElementById("jspsych-survey-multi-choice-next").style.visibility = "hidden";
-
+            // 居中显示
+            document.getElementsByClassName("jspsych-survey-multi-choice-question")[0].style.textAlign = "center";
             let describe = {
                 "能力": "用于描述人可用来完成某一项目标或者任务的综合素质（这里的目标和任务不包括人际交往）",
                 "道德": "用于描述人的道德品格或道德品质（包括积极与消极）",
@@ -338,10 +339,11 @@ function start() {
             }, dime = jsPsych.timelineVariable("dimension", true);
             // 创建下方提示语
             let p = document.createElement("p");
-            p.innerHTML = jsPsych.timelineVariable("isTrap", true) ? "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）" : 
-                "<span style='position: absolute;bottom: 11em;left: calc(50% - 450px);width: 900px;font-weight: 100;'>" +
-                    dime + ":" + describe[dime] +
-                    "</span><br/>请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）";
+            p.innerHTML = jsPsych.timelineVariable("isTrap", true) ? "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）" :
+                "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）" +
+                "<br/><br/><span style='font-weight: 100;'>" +
+                dime + ":" + describe[dime] +
+                "</span>";
             p.style = "font-size: 20px; font-weight: normal;";
             document.getElementById("jspsych-content").appendChild(p);
 
@@ -351,7 +353,7 @@ function start() {
             });
             $("body").keydown(function (a) {
                 let key = a.originalEvent.key;
-                if(key == " " & parseInt($("#jspsych-survey-multi-choice-next").attr("choose"))) {
+                if (key == " " & parseInt($("#jspsych-survey-multi-choice-next").attr("choose"))) {
                     $("#jspsych-survey-multi-choice-next").click();
                 }
                 if (parseInt(key) > 0) {
@@ -384,12 +386,12 @@ function start() {
     };
     timeline.push(introducation_prac1(), {
         type: "call-function",
-        func: function() { 
+        func: function () {
             blockNum = 1;
         }
     }, {
         timeline: [prac1],
-        timeline_variables: jsPsych.randomization.shuffle(variable.splice(0,1)[0])
+        timeline_variables: jsPsych.randomization.shuffle(variable.splice(0, 1)[0])
     });
     while (variable.length > 0) {
         timeline.push({
@@ -398,19 +400,19 @@ function start() {
             choices: [" "]
         }, {
             type: "call-function",
-            func: function() { 
+            func: function () {
                 blockNum += 1;
             }
         }, {
             timeline: [prac1],
-            timeline_variables: jsPsych.randomization.shuffle(variable.splice(0,1)[0])
+            timeline_variables: jsPsych.randomization.shuffle(variable.splice(0, 1)[0])
         });
     }
 
     // 第二部分 效价打分
     // 定义一下第二个单词block,防止时间线变量为空
     let trap2 = [
-        {word: "请在本题选择第六个选项", isTrap: true}
+        { word: "请在本题选择第六个选项", isTrap: true }
     ]
     variable = [];
     for (let i = 0; i < word_tmp.length; i++) {
@@ -461,7 +463,7 @@ function start() {
             });
             $("body").keydown(function (a) {
                 let key = a.originalEvent.key;
-                if(key == " " & parseInt($("#jspsych-survey-multi-choice-next").attr("choose"))) {
+                if (key == " " & parseInt($("#jspsych-survey-multi-choice-next").attr("choose"))) {
                     $("#jspsych-survey-multi-choice-next").click();
                 }
                 if (parseInt(key) > 0) {
@@ -487,7 +489,7 @@ function start() {
 
     timeline.push(introducation_prac2(), {
         type: "call-function",
-        func: function() { 
+        func: function () {
             blockNum += 1;
         }
     }, {
@@ -501,7 +503,7 @@ function start() {
             choices: [" "]
         }, {
             type: "call-function",
-            func: function() { 
+            func: function () {
                 blockNum += 1;
             }
         }, {
@@ -517,7 +519,7 @@ function start() {
             mupsyEnd({
                 data: jsPsych.data.get().filter({ save: true }).addToAll(info).filterColumns(
                     ["subj_idx", "Name", "Sex", "Education", "Birthplace", "BirthType", "Currentplace", "CurrType", "BirthYear", "Type",
-                        "isTrap", "word", "wordLen", "wordGroup", "dimension", "dimensionEn", "dimensionGroup", "blockNum", 
+                        "isTrap", "word", "wordLen", "wordGroup", "dimension", "dimensionEn", "dimensionGroup", "blockNum",
                         "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]
                 ),
                 name: "SCTS",
