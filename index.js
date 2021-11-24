@@ -8,8 +8,6 @@ function auto() {
         document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keyup", { key: "w" }));
         document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keydown", { key: " " }));
         document.getElementsByTagName("body")[0].dispatchEvent(new KeyboardEvent("keyup", { key: " " }));
-
-        $("button").click();
     }, 1000);
 }
 
