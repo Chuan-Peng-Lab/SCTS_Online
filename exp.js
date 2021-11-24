@@ -192,7 +192,7 @@ function introducation_prac1() {
         </style>    \
 <div style='text-align: left'>\
 <p>实验的呈现界面如下：</p> \
-<p class='example'><img src='sample.png' /></p>\
+<p class='example'><img src='" + images[0] + "' /></p>\
 \
 <p>如果您已经明白本研究的任务，请按 <strong>继续</strong> 开始正式实验。</p> \
 <p>如果您还有疑问，请咨询实验人员。</p> \
@@ -245,7 +245,7 @@ function introducation_prac2() {
 </style>    \
 <div style='text-align: left'> \
 <p>实验的呈现界面如下：</p> \
-<p class='example'><img src='sample2.png' /></p>\
+<p class='example'><img src='" + images[1] + "' /></p>\
 \
 <p>如果您明白了，请按 <strong>继续</strong> 进行正式实验。</p> \
 <p>如果您还有疑问，请咨询实验人员。</p> \

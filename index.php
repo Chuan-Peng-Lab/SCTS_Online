@@ -38,6 +38,7 @@
     let delay = 800; // 全部选择后 跳转延迟时间，单位为毫秒
     let blank = 500; // 每个trial之间的空白屏时间 单位 毫秒
 
+    let images = ["sample.png?" + `_=${new Date().getTime()}`, "sample2.png?" + `_=${new Date().getTime()}`];
     let dimension = ["能力", "道德", "社交能力", "外貌", "社会经济地位"]; // 需要维度评分的维度
     let dimEn = {
         "能力": "ability",
@@ -178,7 +179,7 @@ $(window).resize(function() {
             }
         }, {
             type: "preload",
-            images: ["sample.png?" + `_=${new Date().getTime()}`, "sample2.png?" + `_=${new Date().getTime()}`]
+            images: images
         }],
         on_finish: function () {
             timeline.push(begin_introduction());
