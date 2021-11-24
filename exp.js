@@ -323,7 +323,7 @@ function start() {
                 "外貌": "用于描述人的长相、身材等",
                 "社交能力": "用于描述人的人际交往能力",
                 "社会经济地位": "用于描述人的社会地位和经济水平等"
-              }, dime = "能力";
+              }, dime = jsPsych.timelineVariable("dimension", true);
               // 创建下方提示语
               let p = document.createElement("p");
               p.innerHTML = jsPsych.timelineVariable("isTrap") ?  "" :
