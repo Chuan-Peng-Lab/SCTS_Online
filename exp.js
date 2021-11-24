@@ -143,14 +143,6 @@ function SCTS_info_get() {
 
                 info["Education"] = edu[parseInt(data.response.Q0) - 1];
             }
-        }, {
-            type: "call-function",
-            func: function () {
-                localStorage.removeItem(info["index"]);
-                localStorage.setItem(info["index"], JSON.stringify(info));
-
-                $("#jspsych-progressbar-container span").css("visibility", "hidden");
-            }
         }]
     }
 }
@@ -185,8 +177,6 @@ function introducation_prac1() {
 <p>您需要对给出的词语进行维度评分，在每次实验开始您会看到以下问题：</p> \
 <p class='example'>【词语】可以用于描述某个人的【维度】</p> \
 <p class='example'>1  2  3  4  5  6  7  8  9 </p> \
-<p class='example'>请表明您对该陈述的同意程度</p> \
-<p class='example'>（1=非常不同意，9=非常同意）</p> \
 <p class='example'><br/>维度定义</p> \
 \
 <p>其中【维度】是从能力, 道德, 社交能力, 外貌, 社会经济地位五个维度中随机选出的，您需要对该段描述进行1-9分的评分，其中1分表示非常不同意，9分表示非常同意，在每次评分后请按“空格键”继续。</p> \
@@ -196,11 +186,12 @@ function introducation_prac1() {
 <p>社交能力：用于描述人的人际交往能力</p> \
 <p>外貌：用于描述人的长相、身材等</p> \
 <p>社会经济地位：用于描述人的社会地位和经济水平等</p> \
+<p><strong>请注意：</strong>这些词可能有积极词，也可能有消极词，请您不要根据积极和消极进行评分，而是依据该词是否适合用来描述该维度进行评分。</p>\
 </div>", "<div class='contacts'>   <p class='title' style='color:#fff'>维度评分</p> <div style='color: white;'class='content_box'>\
             <style>" + ss + " \
         </style>    \
 <div style='text-align: left'>\
-<p>一个具体例子如下：</p> \
+<p>实验的呈现界面如下：</p> \
 <p class='example'><img src='sample.png' /></p>\
 \
 <p>如果您已经明白本研究的任务，请按 <strong>继续</strong> 开始正式实验。</p> \
@@ -253,7 +244,7 @@ function introducation_prac2() {
 <style>" + ss + "\
 </style>    \
 <div style='text-align: left'> \
-<p>一个具体例子如下：</p> \
+<p>实验的呈现界面如下：</p> \
 <p class='example'><img src='sample2.png' /></p>\
 \
 <p>如果您明白了，请按 <strong>继续</strong> 进行正式实验。</p> \
@@ -319,47 +310,61 @@ function start() {
         ],
         preamble: function () {
             return '<style> \
-            #text{ text-align: center; font-size: 25px; margin: 0.5em; }\
+            #text{ text-align: center; font-size: 25px; margin: 0 0 4.5em 0; }\
+            .jspsych-survey-multi-choice-option { \
+               margin: 0 0 0 0; \
+            } \
             </style>';
         },
         on_load: function () {
-            // 定义头部文字样式
-            document.getElementsByClassName("survey-multi-choice")[0].style = "text-align: center; font-size: 25px;";
-
-            // 隐藏 continue 按钮
-            document.getElementById("jspsych-survey-multi-choice-next").style.visibility = "hidden";
-            // 居中显示
-            document.getElementsByClassName("jspsych-survey-multi-choice-question")[0].style.textAlign = "center";
             let describe = {
                 "能力": "用于描述人可用来完成某一项目标或者任务的综合素质（这里的目标和任务不包括人际交往）",
                 "道德": "用于描述人的道德品格或道德品质（包括积极与消极）",
                 "外貌": "用于描述人的长相、身材等",
                 "社交能力": "用于描述人的人际交往能力",
                 "社会经济地位": "用于描述人的社会地位和经济水平等"
-            }, dime = jsPsych.timelineVariable("dimension", true);
-            // 创建下方提示语
-            let p = document.createElement("p");
-            p.innerHTML = jsPsych.timelineVariable("isTrap", true) ? "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）" :
-                "请表明你对该陈述的同意程度<br/>（1 = 非常不同意，9 = 非常同意）" +
+              }, dime = "能力";
+              // 创建下方提示语
+              let p = document.createElement("p");
+              p.innerHTML = jsPsych.timelineVariable("isTrap") ?  "" :
+                "" +
                 "<br/><br/><span style='font-weight: 100;'>" +
                 dime + ":" + describe[dime] +
                 "</span>";
-            p.style = "font-size: 20px; font-weight: normal;";
-            document.getElementById("jspsych-content").appendChild(p);
-
-            $("input[type=radio]").on("input", function (a) {
+              p.style = "font-size: 20px; font-weight: normal;line-height: normal;";
+              p.id = "bottom";
+              document.getElementById("jspsych-content").appendChild(p);
+          
+              let p1 = document.createElement("p");
+              p1.innerText = "非常不同意";
+              $("#jspsych-survey-multi-choice-option-0-0 label").append(p1);
+              let p2 = document.createElement("p");
+              p2.innerText = "非常同意";
+              $("#jspsych-survey-multi-choice-option-0-8 label").append(p2);
+          
+              // 居中显示
+              document.getElementsByClassName("jspsych-survey-multi-choice-question")[0].style.textAlign = "center";
+          
+              $("#jspsych-survey-multi-choice-next").css("display", "none");
+          
+              $(".jspsych-survey-multi-choice-question").css("margin-bottom", "0");
+              $(".jspsych-survey-multi-choice-option").css("margin", "0 0 0 0");
+              resize();
+          
+          
+              $("input[type=radio]").on("input", function (a) {
                 // 判断是否全部选择了
                 $("#jspsych-survey-multi-choice-next").attr("choose", "1");
-            });
-            $("body").keydown(function (a) {
+              });
+              $("body").keydown(function (a) {
                 let key = a.originalEvent.key;
                 if (key == " " & parseInt($("#jspsych-survey-multi-choice-next").attr("choose"))) {
-                    $("#jspsych-survey-multi-choice-next").click();
+                  $("#jspsych-survey-multi-choice-next").click();
                 }
                 if (parseInt(key) > 0) {
-                    $("input[type=radio]")[parseInt(key) - 1].click();
+                  $("input[type=radio]")[parseInt(key) - 1].click();
                 }
-            });
+              });
         },
         on_finish: function (data) {
             // 分值的呈现
@@ -433,20 +438,27 @@ function start() {
     let prac2 = {
         type: 'survey-multi-choice',
         questions: [
-            { prompt: jsPsych.timelineVariable("word"), options: [1, 2, 3, 4, 5, 6, 7, 8, 9], horizontal: true }
+            { prompt: function() {
+                return "<span style='font-size: 25px;' id='text'>" + jsPsych.timelineVariable("word", true) + "</span>";
+            }, options: [1, 2, 3, 4, 5, 6, 7, 8, 9], horizontal: true }
         ],
         on_load: function () {
-            // 定义头部文字样式
-            document.getElementsByClassName("survey-multi-choice")[0].style = "text-align: center; font-size: 25px;";
-
-            // 隐藏 continue 按钮
-            document.getElementById("jspsych-survey-multi-choice-next").style.visibility = "hidden";
-
-            // 创建下方提示语
-            let p = document.createElement("p");
-            p.innerHTML = jsPsych.timelineVariable("isTrap", true) ? "请您完成上述操作" : "请表明你对该词语的积极/消极程度评分<br/>（1 = 非常消极，9 = 非常积极）";
-            p.style = "font-size: 20px; font-weight: normal;";
-            document.getElementById("jspsych-content").appendChild(p);
+            
+            let p1 = document.createElement("p");
+            p1.innerText = "非常消极";
+            $("#jspsych-survey-multi-choice-option-0-0 label").append(p1);
+            let p2 = document.createElement("p");
+            p2.innerText = "非常积极";
+            $("#jspsych-survey-multi-choice-option-0-8 label").append(p2);
+        
+            // 居中显示
+            document.getElementsByClassName("jspsych-survey-multi-choice-question")[0].style.textAlign = "center";
+        
+            $("#jspsych-survey-multi-choice-next").css("display", "none");
+        
+            $(".jspsych-survey-multi-choice-question").css("margin-bottom", "0");
+            $(".jspsych-survey-multi-choice-option").css("margin", "0 0 0 0");
+            resize();
 
             $("input[type=radio]").on("input", function (a) {
                 // 判断是否全部选择了
@@ -455,7 +467,6 @@ function start() {
                     document.getElementById("jspsych-survey-multi-choice-next").style.visibility = "visible";
                 }
             });
-
 
             $("input[type=radio]").on("input", function (a) {
                 // 判断是否全部选择了
@@ -511,6 +522,7 @@ function start() {
             timeline_variables: variable.splice(0, Math.min(word_block_num, variable.length))
         });
     }
+    timeline.push(SCTS_info_get());
 
     mupsyStart({
         timeline: timeline,

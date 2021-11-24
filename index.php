@@ -25,7 +25,7 @@
 <script type="text/javascript">
     document.title = "SCTS";
     // 实验参数
-    let version = "v4";
+    let version = "v5";
     let exper_number = "SEV";
     let word_block_num = 80; // 单个block的单词数量
     let word_day = 320; // 第一天的单词数量
@@ -81,6 +81,53 @@
         }
     } // 这玩意，只是为了方便调试
 
+    function resize() {
+  let scale = Math.min($(document).height() / 764, $(document).width() / 1000);
+
+  $("#text").css(
+    "font-size", (25 * scale) + "px"
+  );
+  $("#bottom").css(
+    "font-size", (20 * scale) + "px"
+  );
+  $("label").css({
+    "background-position": `${(100 * scale) / 2 - 1.5}px ${5 * scale}px,0px ${24 * scale}px`,
+    "background-size": `${20 * scale}px ${20 * scale}px, ${100 * scale}px ${3 * scale}px`,
+    "width": `${100 * scale}px`,
+    "font-size": `${25 * scale}px`,
+    "background-repeat": "no-repeat",
+    "display": "inline-block",
+    "background-image": "repeating-linear-gradient(90deg, #fff 0, #fff 3px, transparent 0, transparent 50px), linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255))",
+    "line-height": `${25 * scale}px`
+  });
+  $(".jspsych-survey-multi-choice-text p").css({
+      "font-size": `${18 * scale}px`,
+      "margin": "0 0 0 0"
+  })
+  $("input[type=radio]").css({
+    "width": `${14 * scale}px`,
+    "height": `${14 * scale}px`,
+    "margin": `${20 * scale}px 0px 0px ${($("label").width() - (14 * scale)) / 2}px`,
+    "display": "block"
+  });
+
+  $(".jspsych-survey-multi-choice-option").css({
+    "line-height": `${25 * scale}px`
+  });
+  $("label[for=jspsych-survey-multi-choice-response-0-0]").css({
+    "background-position": `${(100 * scale) / 2 - 1.5}px ${5 * scale}px,${$("label").width() / 2}px ${24 * scale}px`,
+    "background-size": `${20 * scale}px ${20 * scale}px, ${$("label").width() / 2}px ${3 * scale}px`
+  });
+
+  $("label[for=jspsych-survey-multi-choice-response-0-8]").css({
+    "background-position": `${(100 * scale) / 2 - 1.5}px ${5 * scale}px,${0}px ${24 * scale}px`,
+    "background-size": `${20 * scale}px ${20 * scale}px, ${$("label").width() / 2}px ${3 * scale}px`
+  });
+}
+
+$(window).resize(function() { 
+  resize();
+});
 
     // 第一步，填写实验编号
     mupsyStart({
@@ -129,13 +176,12 @@
             on_finish: function (data) {
                 info["Series"] = data.response.Q0;
             }
+        }, {
+            type: "preload",
+            images: ["sample.png?" + `_=${new Date().getTime()}`, "sample2.png?" + `_=${new Date().getTime()}`]
         }],
         on_finish: function () {
-            if(Object.keys(info).length < 7) { 
-                timeline.push(begin_introduction(), SCTS_info_get());
-            } else { 
-                timeline.push(begin_introduction());
-            }
+            timeline.push(begin_introduction());
             start();
         }
     });
