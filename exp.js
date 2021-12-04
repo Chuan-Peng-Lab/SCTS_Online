@@ -170,7 +170,7 @@ function introducation_prac1() {
         // 指导语部分
         type: "instructions",
         pages: [
-            "<div class='contacts'>   <p class='title' style='color:#fff'>维度评分</p> <div style='color: white;'class='content_box'> \
+            "<div class='contacts'>   <p class='title' style='color:#fff'>第一部分</p> <div style='color: white;'class='content_box'> \
             <style>" + ss + " \
         </style>    \
 <div style='text-align: left'>\
@@ -187,13 +187,13 @@ function introducation_prac1() {
 <p>外貌：用于描述人的长相、身材等</p> \
 <p>社会经济地位：用于描述人的社会地位和经济水平等</p> \
 <p><strong>请注意：</strong>这些词可能有积极词，也可能有消极词，请您不要根据积极和消极进行评分，而是依据该词是否适合用来描述该维度进行评分。</p>\
-</div>", "<div class='contacts'>   <p class='title' style='color:#fff'>维度评分</p> <div style='color: white;'class='content_box'>\
+</div>", "<div class='contacts'>   <p class='title' style='color:#fff'>第一部分</p> <div style='color: white;'class='content_box'>\
 <style>" + ss + " \
 </style>    \
 <div style='text-align: left; margin: 0 15% 0 15%;'>\
 <p>举个例子：“强盗”这个词，看到之后通常会想到”用暴力抢夺他人财物的人”，这时，虽然该词为消极词，但它是用来描述某人的道德水平低，因此对”【强盗】可以用于描述某个人的【道德】”这一问题的评分通常为8分或9分。而”拘泥”这个词，有的人看到后可能会想到它的动词含义，即“不懂得变通”，所以在”【拘泥】可以用于描述某个人的【能力】”这一问题上偏向于同意，即评分在7分以上；而有的人可能会联想到它的形容词含义，即”拘束,不自然“，所以他们认为这个词并不适合用来描述能力，即评分在3分以下；还有的人可能觉得这个词既可以描述，又不可以描述，那么此时的评分通常在5分左右。</p> \
 <p><strong>因此，看到词汇的感受是因人而异的，没有对错之分，在评定的时候依据自己的的第一感觉即可。</strong></p>\
-</div>", "<div class='contacts'>   <p class='title' style='color:#fff'>维度评分</p> <div style='color: white;'class='content_box'>\
+</div>", "<div class='contacts'>   <p class='title' style='color:#fff'>第一部分</p> <div style='color: white;'class='content_box'>\
             <style>" + ss + " \
         </style>    \
 <div style='text-align: left'>\
@@ -234,7 +234,7 @@ function introducation_prac2() {
         // 指导语部分
         type: "instructions",
         pages: [
-            "<div class='contacts'>   <p class='title' style='color:#fff'>效度评分</p> <div style='color: white;'class='content_box'>\
+            "<div class='contacts'>   <p class='title' style='color:#fff'>第二部分</p> <div style='color: white;'class='content_box'>\
             <style>" + ss + "\
         </style>    \
 <div style='text-align: left'> \
@@ -246,14 +246,14 @@ function introducation_prac2() {
 <p>您需要对词语的积极/消极程度进行1-9分的评分，其中1分表示非常消极，9分表示非常积极。评分可以采用鼠标点击相应数字，也可以直接在键盘上按相应数字键（1-9）进行评分，但在每次评分后都请按“空格键”继续。</p>\
 <p>如果您明白了，请按 <strong>继续</strong> 查看示例。</p> \
 \
-</div>", "<div class='contacts'>   <p class='title' style='color:#fff'>效度评分</p> <div style='color: white;'class='content_box'>\
+</div>", "<div class='contacts'>   <p class='title' style='color:#fff'>第二部分</p> <div style='color: white;'class='content_box'>\
 <style>" + ss + "\
 </style>    \
 <div style='text-align: left; margin: 0 15% 0 15%;'> \
 <p>举个例子：“缜密”这个词，看到之后通常会让人想到做事周到细致，因此对”【缜密】”的评价偏向于积极，即评分通常在7分以上；而”坏人”这个词，看到之后通常让人感觉害怕，因此对”【坏人】”的评价偏向于消极，即评分通常在3分以下；而”异想天开”这个词，既会让人想到荒唐离奇，也会让人想到超强的创新和想象力，因此对该词的评价偏向于中性，即评分通常在5分左右。</p> \
 <p><strong>因此，看到词汇的感受是因人而异的，没有对错之分，在评定的时候依据自己的的第一感觉即可。</strong></p> \
 \
-</div>", "<div class='contacts'>   <p class='title' style='color:#fff'>效度评分</p> <div style='color: white;'class='content_box'>\
+</div>", "<div class='contacts'>   <p class='title' style='color:#fff'>第二部分</p> <div style='color: white;'class='content_box'>\
 <style>" + ss + "\
 </style>    \
 <div style='text-align: left'> \
