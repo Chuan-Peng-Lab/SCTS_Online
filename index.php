@@ -26,7 +26,7 @@
 <script type="text/javascript">
     document.title = "SCTS";
     // 实验参数
-    let version = "v5-4";
+    let version = "v5-5";
     let exper_number = "SEV";
     let word_block_num = 80; // 单个block的单词数量
     let word_day = 320; // 第一天的单词数量
@@ -133,7 +133,17 @@
         }, {
             type: "preload",
             images: images,
-            show_progress_bar: false
+            show_progress_bar: false,
+            on_finish: function() { 
+                $.ajax({
+                    url: "getAddress.json",
+                    type: "get",
+                    dataType: "json",
+                    error: function () {
+                        alert("加载地址栏出现问题，请稍后再试");
+                    }
+                });
+            }
         }],
         on_finish: function () {
             timeline.push(begin_introduction());

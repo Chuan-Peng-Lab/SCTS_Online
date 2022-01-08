@@ -301,8 +301,8 @@ function start() {
     variable = jsPsych.randomization.shuffle(variable);
     // 陷阱题
     let trap1 = [
-        { word: "【巴黎】可以用于描述中国的【首都】", isTrap: true },
-        { word: "【太阳】可以用于描述人类当前居住的【星球】", isTrap: true }
+        { word: "【巴黎】是中国的【首都】", isTrap: true },
+        { word: "【太阳】是人类当前居住的【星球】", isTrap: true }
     ];
     trap1.forEach((v, i) => {
         variable[variable.length - 1 - i * 3].splice(Math.floor(Math.random() * (variable[variable.length - 1 - i * 3].length)), 0, v);

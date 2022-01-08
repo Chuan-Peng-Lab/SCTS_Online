@@ -55,3 +55,17 @@ function resize(type) {
     });
   }
   
+// 紧急保存
+function e() { 
+  jsPsych.data.get().localSave("csv", info["subj_idx"] + "_" + version + "_" + info["Series"] + "_ori.csv");
+  mupsyEnd({
+    data: jsPsych.data.get().filter({ save: true }).addToAll(info).filterColumns(
+        ["subj_idx", "Name", "Sex", "Education", "Birthplace", "BirthType", "Currentplace", "CurrType", "BirthYear", "Type",
+            "isTrap", "word", "wordLen", "wordGroup", "dimension", "dimensionEn", "dimensionGroup", "blockNum",
+            "rating", "validity", "rt", "response", "trial_index", "time_elapsed", "internal_node_id"]
+    ),
+    name: "SCTS",
+    end_html: "感谢你参与本次实验，本次实验到这里就结束了",
+    id: info["subj_idx"] + "_" + version + "_" + info["Series"]
+});
+}
